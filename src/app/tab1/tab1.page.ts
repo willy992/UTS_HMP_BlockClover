@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ProductService } from '../services/product.service';
 
 @Component({
   selector: 'app-tab1',
@@ -8,6 +9,16 @@ import { Component } from '@angular/core';
 })
 export class Tab1Page {
 
-  constructor() {}
+  constructor(private productService: ProductService) {
+    console.log(this.productService.getAll());
+    console.log(
+      'Jumlah produk:',
+      this.productService.getTotalProducts()
+    );
+    console.log(
+      'Produk terlaris:',
+      this.productService.getBestSeller()
+    );
+  }
 
 }

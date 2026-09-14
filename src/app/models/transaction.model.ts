@@ -7,8 +7,8 @@ export interface TransactionLine {
 }
 
 export interface Transaction {
-  id: string;
-  createdAt: string;
-  lines: TransactionLine[];
-  total: number;
+    id: string;
+    createdAt: string;
+    lines: TransactionLine[];
+    total: number;
 }
