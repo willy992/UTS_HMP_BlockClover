@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 
-import { Tab3PageModule } from './tab3.module';
-import { Tab3Page } from './tab3.page';
+import { TransactionsPageModule } from './transactions.module';
+import { TransactionsPage } from './transactions.page';
 
-describe('Tab3Page', () => {
-  let component: Tab3Page;
-  let fixture: ComponentFixture<Tab3Page>;
+describe('TransactionsPage', () => {
+  let component: TransactionsPage;
+  let fixture: ComponentFixture<TransactionsPage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Tab3PageModule, RouterModule.forRoot([])]
+      imports: [TransactionsPageModule, RouterModule.forRoot([])]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Tab3Page);
+    fixture = TestBed.createComponent(TransactionsPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
