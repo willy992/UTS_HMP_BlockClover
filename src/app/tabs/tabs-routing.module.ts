@@ -20,6 +20,10 @@ const routes: Routes = [
         loadChildren: () => import('../pages/transactions/transactions.module').then(m => m.TransactionsPageModule)
       },
       {
+        path: 'profile',
+        loadChildren: () => import('../pages/profile/profile.module').then(m => m.ProfilePageModule)
+      },
+      {
         path: '',
         redirectTo: '/tabs/dashboard',
         pathMatch: 'full'
