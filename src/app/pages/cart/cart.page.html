@@ -9,8 +9,22 @@
 
 <ion-content [fullscreen]="true">
   <div class="cart-content">
-    <ion-text color="danger" *ngIf="errorMessage">
-      <p class="status-message">{{ errorMessage }}</p>
+    <ion-text
+      color="success"
+      *ngIf="feedbackMessage"
+      class="feedback-message"
+      [class.feedback-active]="feedbackActive"
+      aria-live="polite">
+      <p>{{ feedbackMessage }}</p>
+    </ion-text>
+
+    <ion-text
+      color="danger"
+      *ngIf="errorMessage"
+      class="status-message"
+      [class.error-feedback]="errorFeedbackActive"
+      role="alert">
+      <p>{{ errorMessage }}</p>
     </ion-text>
 
     <ion-card color="warning" *ngIf="hasStockConflict">
@@ -28,7 +42,7 @@
     </div>
 
     <ion-list *ngIf="!isCartEmpty">
-      <ion-item *ngFor="let item of items; trackBy: trackByProductId">
+      <ion-item *ngFor="let item of items; trackBy: trackByProductId" [class.item-feedback]="feedbackProductId === item.product.id && feedbackActive">
         <ion-thumbnail slot="start">
           <img
             *ngIf="item.product.imageUrl"

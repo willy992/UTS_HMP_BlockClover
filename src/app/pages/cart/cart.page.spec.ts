@@ -48,4 +48,25 @@ describe('CartPage', () => {
     expect(component.errorMessage).toContain('TransactionService');
     expect(cartService.getItems()).toHaveLength(1);
   });
+
+    it('shows visual feedback after a quantity change', () => {
+    cartService.add(1);
+    component.ionViewWillEnter();
+
+    component.increase(component.items[0]);
+
+    expect(component.feedbackMessage).toContain('Quantity');
+    expect(component.feedbackProductId).toBe(1);
+    expect(component.items[0].quantity).toBe(2);
+  });
+
+  it('shows feedback after an item is removed', () => {
+    cartService.add(1);
+    component.ionViewWillEnter();
+
+    component.remove(component.items[0]);
+
+    expect(component.feedbackMessage).toContain('dihapus');
+    expect(component.isCartEmpty).toBe(true);
+  });
 });

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CartItem } from '../../models/cart-item.model';
 import { CartService } from '../../services/cart.service';
 
@@ -8,15 +8,29 @@ import { CartService } from '../../services/cart.service';
   styleUrls: ['./cart.page.scss'],
   standalone: false,
 })
-export class CartPage implements OnInit {
+export class CartPage implements OnInit, OnDestroy {
   items: CartItem[] = [];
   total = 0;
   errorMessage = '';
+  feedbackMessage = '';
+  feedbackProductId: number | null = null;
+  feedbackActive = false;
+  errorFeedbackActive = false;
+
+  private cartHasLoaded = false;
+  private readonly knownProductIds = new Set<number>();
+  private feedbackStartTimer?: ReturnType<typeof setTimeout>;
+  private feedbackDismissTimer?: ReturnType<typeof setTimeout>;
+  private errorFeedbackTimer?: ReturnType<typeof setTimeout>;
 
   constructor(private readonly cartService: CartService) {}
 
   ngOnInit(): void {
     this.refreshCart();
+  }
+
+  ngOnDestroy(): void {
+    this.clearTimers();
   }
 
   ionViewWillEnter(): void {
@@ -41,11 +55,19 @@ export class CartPage implements OnInit {
 
   setQuantity(item: CartItem, quantity: number): void {
     try {
-      this.cartService.setQuantity(item.product.id, quantity);
+      const updatedItem = this.cartService.setQuantity(item.product.id, quantity);
+
       this.errorMessage = '';
+      this.refreshCart();
+
+      if (updatedItem) {
+        this.showFeedback(
+          `Quantity ${updatedItem.product.name} diperbarui.`,
+          updatedItem.product.id
+        );
+      }
     } catch (error) {
-      this.errorMessage = this.toMessage(error);
-    } finally {
+      this.showError(this.toMessage(error));
       this.refreshCart();
     }
   }
@@ -57,7 +79,7 @@ export class CartPage implements OnInit {
     const value = event.detail.value;
 
     if (value === undefined || value === null || String(value).trim() === '') {
-      this.errorMessage = 'Quantity harus diisi.';
+      this.showError('Quantity harus diisi.');
       this.refreshCart();
       return;
     }
@@ -67,24 +89,31 @@ export class CartPage implements OnInit {
 
   remove(item: CartItem): void {
     try {
-      this.cartService.remove(item.product.id);
+      const removed = this.cartService.remove(item.product.id);
+
       this.errorMessage = '';
+      this.refreshCart();
+
+      if (removed) {
+        this.showFeedback(`${item.product.name} dihapus dari keranjang.`);
+      }
     } catch (error) {
-      this.errorMessage = this.toMessage(error);
-    } finally {
+      this.showError(this.toMessage(error));
       this.refreshCart();
     }
   }
 
   checkout(): void {
     if (this.hasStockConflict) {
-      this.errorMessage =
-        'Stok salah satu produk berubah. Perbarui quantity sebelum checkout.';
+      this.showError(
+        'Stok salah satu produk berubah. Perbarui quantity sebelum checkout.'
+      );
       return;
     }
 
-    this.errorMessage =
-      'Checkout akan tersedia setelah TransactionService terintegrasi.';
+    this.showError(
+      'Checkout akan tersedia setelah TransactionService terintegrasi.'
+    );
   }
 
   formatPrice(value: number): string {
@@ -100,8 +129,76 @@ export class CartPage implements OnInit {
   }
 
   private refreshCart(): void {
-    this.items = this.cartService.getItems();
+    const nextItems = this.cartService.getItems();
+    const addedItems = this.cartHasLoaded
+      ? nextItems.filter((item) => !this.knownProductIds.has(item.product.id))
+      : [];
+
+    this.items = nextItems;
     this.total = this.cartService.getTotal();
+
+    this.knownProductIds.clear();
+    this.items.forEach((item) => this.knownProductIds.add(item.product.id));
+    this.cartHasLoaded = true;
+
+    if (addedItems.length > 0) {
+      const [addedItem] = addedItems;
+      this.showFeedback(
+        `${addedItem.product.name} ditambahkan ke keranjang.`,
+        addedItem.product.id
+      );
+    }
+  }
+
+  private showFeedback(message: string, productId: number | null = null): void {
+    this.feedbackMessage = message;
+    this.feedbackProductId = productId;
+    this.feedbackActive = false;
+
+    if (this.feedbackStartTimer) {
+      clearTimeout(this.feedbackStartTimer);
+    }
+
+    if (this.feedbackDismissTimer) {
+      clearTimeout(this.feedbackDismissTimer);
+    }
+
+    this.feedbackStartTimer = setTimeout(() => {
+      this.feedbackActive = true;
+
+      this.feedbackDismissTimer = setTimeout(() => {
+        this.feedbackActive = false;
+        this.feedbackMessage = '';
+        this.feedbackProductId = null;
+      }, 2200);
+    }, 0);
+  }
+
+  private showError(message: string): void {
+    this.errorMessage = message;
+    this.errorFeedbackActive = false;
+
+    if (this.errorFeedbackTimer) {
+      clearTimeout(this.errorFeedbackTimer);
+    }
+
+    this.errorFeedbackTimer = setTimeout(() => {
+      this.errorFeedbackActive = true;
+    }, 0);
+  }
+
+  private clearTimers(): void {
+    if (this.feedbackStartTimer) {
+      clearTimeout(this.feedbackStartTimer);
+    }
+
+    if (this.feedbackDismissTimer) {
+      clearTimeout(this.feedbackDismissTimer);
+    }
+
+    if (this.errorFeedbackTimer) {
+      clearTimeout(this.errorFeedbackTimer);
+    }
   }
 
   private toMessage(error: unknown): string {
