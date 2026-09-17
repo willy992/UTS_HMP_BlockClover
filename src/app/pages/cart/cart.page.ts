@@ -52,11 +52,11 @@ export class CartPage implements OnInit {
 
   onQuantityChange(
     item: CartItem,
-    event: CustomEvent<{ value: string | number | null }>
+    event: CustomEvent<{ value?: string | number | null }>
   ): void {
     const value = event.detail.value;
 
-    if (value === null || String(value).trim() === '') {
+    if (value === undefined || value === null || String(value).trim() === '') {
       this.errorMessage = 'Quantity harus diisi.';
       this.refreshCart();
       return;

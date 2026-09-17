@@ -1,3 +1,4 @@
+  import { TestBed } from '@angular/core/testing';
   import { CartService } from './cart.service';
   import { ProductService } from './product.service';
 
@@ -6,8 +7,10 @@
     let service: CartService;
 
     beforeEach(() => {
-      productService = new ProductService();
-      service = new CartService(productService);
+      TestBed.configureTestingModule({});
+      productService = TestBed.inject(ProductService);
+      service = TestBed.inject(CartService);
+      service.clear();
     });
 
     it('adds an item and calculates its total', () => {

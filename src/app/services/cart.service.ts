@@ -1,13 +1,12 @@
-    import { Service } from '@angular/core';
+import { inject, Service } from '@angular/core';
     import { CartItem } from '../models/cart-item.model';
     import { Product } from '../models/product.model';
     import { ProductService } from './product.service';
 
     @Service()
-    export class CartService {
+export class CartService {
+    private readonly productService = inject(ProductService);
     private readonly quantities = new Map<number, number>();
-
-    constructor(private readonly productService: ProductService) {}
 
     getItems(): CartItem[] {
         return Array.from(this.quantities.entries()).map(([productId, quantity]) => {

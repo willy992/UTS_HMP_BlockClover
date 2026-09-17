@@ -1,13 +1,15 @@
+import { TestBed } from '@angular/core/testing';
 import { CartPage } from './cart.page';
 import { CartService } from '../../services/cart.service';
-import { ProductService } from '../../services/product.service';
 
 describe('CartPage', () => {
   let cartService: CartService;
   let component: CartPage;
 
   beforeEach(() => {
-    cartService = new CartService(new ProductService());
+    TestBed.configureTestingModule({});
+    cartService = TestBed.inject(CartService);
+    cartService.clear();
     component = new CartPage(cartService);
     component.ngOnInit();
   });
