@@ -1,0 +1,49 @@
+import { CartPage } from './cart.page';
+import { CartService } from '../../services/cart.service';
+import { ProductService } from '../../services/product.service';
+
+describe('CartPage', () => {
+  let cartService: CartService;
+  let component: CartPage;
+
+  beforeEach(() => {
+    cartService = new CartService(new ProductService());
+    component = new CartPage(cartService);
+    component.ngOnInit();
+  });
+
+  it('creates with an empty cart', () => {
+    expect(component).toBeTruthy();
+    expect(component.isCartEmpty).toBe(true);
+    expect(component.total).toBe(0);
+  });
+
+  it('shows cart items and total after refresh', () => {
+    cartService.add(1);
+
+    component.ionViewWillEnter();
+
+    expect(component.items).toHaveLength(1);
+    expect(component.total).toBe(75000);
+  });
+
+  it('shows an error when quantity exceeds product stock', () => {
+    cartService.add(1);
+    component.ionViewWillEnter();
+
+    component.setQuantity(component.items[0], 15);
+
+    expect(component.errorMessage).toContain('melebihi stok');
+    expect(component.items[0].quantity).toBe(1);
+  });
+
+  it('does not create a transaction when checkout is pressed', () => {
+    cartService.add(1);
+    component.ionViewWillEnter();
+
+    component.checkout();
+
+    expect(component.errorMessage).toContain('TransactionService');
+    expect(cartService.getItems()).toHaveLength(1);
+  });
+});

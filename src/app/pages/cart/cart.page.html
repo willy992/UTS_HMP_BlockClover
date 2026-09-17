@@ -1,0 +1,105 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/products"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Keranjang</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="cart-content">
+    <ion-text color="danger" *ngIf="errorMessage">
+      <p class="status-message">{{ errorMessage }}</p>
+    </ion-text>
+
+    <ion-card color="warning" *ngIf="hasStockConflict">
+      <ion-card-content>
+        Stok berubah setelah produk masuk ke keranjang. Sesuaikan quantity sebelum
+        checkout.
+      </ion-card-content>
+    </ion-card>
+
+    <div class="empty-state" *ngIf="isCartEmpty">
+      <ion-icon name="cart-outline"></ion-icon>
+      <h2>Keranjang masih kosong</h2>
+      <p>Tambahkan produk dari halaman Produk untuk mulai berbelanja.</p>
+      <ion-button routerLink="/tabs/products">Lihat Produk</ion-button>
+    </div>
+
+    <ion-list *ngIf="!isCartEmpty">
+      <ion-item *ngFor="let item of items; trackBy: trackByProductId">
+        <ion-thumbnail slot="start">
+          <img
+            *ngIf="item.product.imageUrl"
+            [src]="item.product.imageUrl"
+            [alt]="item.product.name"
+          />
+          <ion-icon *ngIf="!item.product.imageUrl" name="cube-outline"></ion-icon>
+        </ion-thumbnail>
+
+        <ion-label>
+          <h2>{{ item.product.name }}</h2>
+          <p>{{ formatPrice(item.product.sellingPrice) }} / item</p>
+          <p>Stok tersedia: {{ item.product.stock }}</p>
+          <strong>Subtotal: {{ formatPrice(item.subtotal) }}</strong>
+        </ion-label>
+
+        <div class="quantity-control" slot="end">
+          <ion-button
+            fill="clear"
+            aria-label="Kurangi quantity"
+            [disabled]="item.quantity <= 1"
+            (click)="decrease(item)"
+          >
+            <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+          </ion-button>
+
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            min="1"
+            [max]="item.product.stock"
+            [value]="item.quantity"
+            aria-label="Quantity"
+            (ionChange)="onQuantityChange(item, $event)"
+          ></ion-input>
+
+          <ion-button
+            fill="clear"
+            aria-label="Tambah quantity"
+            [disabled]="item.quantity >= item.product.stock"
+            (click)="increase(item)"
+          >
+            <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+          </ion-button>
+
+          <ion-button
+            color="danger"
+            fill="clear"
+            aria-label="Hapus produk"
+            (click)="remove(item)"
+          >
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+    </ion-list>
+
+    <ion-card *ngIf="!isCartEmpty">
+      <ion-card-content class="total-card">
+        <span>Total</span>
+        <strong>{{ formatPrice(total) }}</strong>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button
+      *ngIf="!isCartEmpty"
+      expand="block"
+      [disabled]="hasStockConflict"
+      (click)="checkout()"
+    >
+      Checkout
+    </ion-button>
+  </div>
+</ion-content>

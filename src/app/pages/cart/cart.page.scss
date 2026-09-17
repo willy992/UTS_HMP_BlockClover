@@ -1,0 +1,64 @@
+.cart-content {
+  padding: 16px;
+}
+
+.status-message {
+  margin: 0 0 12px;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 72px 20px;
+  text-align: center;
+
+  ion-icon {
+    color: var(--ion-color-medium);
+    font-size: 72px;
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  p {
+    color: var(--ion-color-medium-shade);
+  }
+}
+
+ion-thumbnail {
+  display: grid;
+  place-items: center;
+
+  ion-icon {
+    color: var(--ion-color-medium);
+    font-size: 32px;
+  }
+}
+
+.quantity-control {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 168px;
+
+  ion-input {
+    border: 1px solid var(--ion-color-medium);
+    border-radius: 6px;
+    max-width: 42px;
+    text-align: center;
+  }
+}
+
+.total-card {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+
+  strong {
+    font-size: 1.15rem;
+  }
+}
