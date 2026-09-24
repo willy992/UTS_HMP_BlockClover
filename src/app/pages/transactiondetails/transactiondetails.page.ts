@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Transaction } from '../../models/transaction.model';
 import { TransactionService } from '../../services/transaction.service';
 
 @Component({
-  selector: 'app-transactions',
-  templateUrl: 'transactions.page.html',
-  styleUrls: ['transactions.page.scss'],
+  selector: 'app-transaction-detail',
+  templateUrl: './transaction-detail.page.html',
+  styleUrls: ['./transaction-detail.page.scss'],
   standalone: false,
 })
-export class TransactionsPage {
-  transactions: Transaction[] = [];
+export class TransactionDetailPage {
+  transaction: Transaction | undefined;
 
   private readonly rupiahFormatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -19,14 +20,21 @@ export class TransactionsPage {
   });
 
   private readonly dateFormatter = new Intl.DateTimeFormat('id-ID', {
-    dateStyle: 'medium',
+    dateStyle: 'full',
     timeStyle: 'short',
   });
 
-  constructor(private readonly transactionService: TransactionService) {}
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly transactionService: TransactionService
+  ) {}
 
   ionViewWillEnter(): void {
-    this.transactions = this.transactionService.getAll();
+    const id = this.route.snapshot.paramMap.get('id');
+
+    this.transaction = id
+      ? this.transactionService.getById(id)
+      : undefined;
   }
 
   formatRupiah(amount: number): string {
@@ -35,18 +43,5 @@ export class TransactionsPage {
 
   formatDate(dateValue: string): string {
     return this.dateFormatter.format(new Date(dateValue));
-  }
-
-  getItemSummary(transaction: Transaction): string {
-    const totalItems = transaction.lines.reduce(
-      (total, line) => total + line.quantity,
-      0
-    );
-
-    return `${transaction.lines.length} jenis produk • ${totalItems} barang`;
-  }
-
-  trackById(_: number, transaction: Transaction): string {
-    return transaction.id;
   }
 }
