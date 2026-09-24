@@ -5,8 +5,8 @@ import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-transaction-detail',
-  templateUrl: './transaction-detail.page.html',
-  styleUrls: ['./transaction-detail.page.scss'],
+  templateUrl: './transactiondetails.page.html',
+  styleUrls: ['./transactiondetails.page.scss'],
   standalone: false,
 })
 export class TransactionDetailPage {

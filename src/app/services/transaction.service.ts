@@ -1,4 +1,4 @@
-import { Service } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { CartItem } from '../models/cart-item.model';
 import { Transaction, TransactionLine } from '../models/transaction.model';
 import { ProductService } from './product.service';
@@ -6,9 +6,8 @@ import { ProductService } from './product.service';
 @Service()
 export class TransactionService {
   private readonly storageKey = 'simobile-transactions';
+  private readonly productService = inject(ProductService);
   private transactions: Transaction[] = this.loadTransactions();
-
-  constructor(private readonly productService: ProductService) {}
 
   checkout(items: CartItem[]): Transaction | undefined {
     const groupedQuantities = new Map<number, number>();
