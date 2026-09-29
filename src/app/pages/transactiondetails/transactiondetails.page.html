@@ -1,0 +1,62 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/tabs/transactions"
+        text="Riwayat"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detail Transaksi</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ng-container *ngIf="transaction; else notFound">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>
+          {{ formatDate(transaction.createdAt) }}
+        </ion-card-subtitle>
+        <ion-card-title>ID: {{ transaction.id }}</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+
+    <ion-list inset="true">
+      <ion-list-header>
+        <ion-label>Produk Dibeli</ion-label>
+      </ion-list-header>
+
+      <ion-item *ngFor="let line of transaction.lines">
+        <ion-label>
+          <h2>{{ line.productName }}</h2>
+          <p>{{ formatRupiah(line.price) }} × {{ line.quantity }}</p>
+        </ion-label>
+
+        <ion-note slot="end">
+          {{ formatRupiah(line.subtotal) }}
+        </ion-note>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h2>Total</h2>
+        </ion-label>
+
+        <ion-note slot="end" class="grand-total">
+          {{ formatRupiah(transaction.total) }}
+        </ion-note>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-template #notFound>
+    <div class="empty-state">
+      <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+      <h2>Transaksi tidak ditemukan</h2>
+      <p>ID transaksi tidak tersedia atau datanya sudah dihapus.</p>
+      <ion-button routerLink="/tabs/transactions">
+        Kembali ke Riwayat
+      </ion-button>
+    </div>
+  </ng-template>
+</ion-content>

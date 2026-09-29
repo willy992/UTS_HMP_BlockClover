@@ -1,0 +1,26 @@
+.global-menu-button {
+  position: fixed;
+  top: calc(var(--ion-safe-area-top, 0px) + 4px);
+  right: 8px;
+  z-index: 1000;
+
+  --color: var(--ion-color-primary);
+}
+
+ion-menu ion-content {
+  --background: var(--ion-background-color);
+}
+
+ion-menu ion-list {
+  padding-top: 8px;
+}
+
+ion-menu ion-item {
+  --border-radius: 8px;
+  margin: 2px 8px;
+}
+
+ion-menu ion-item.selected {
+  --background: rgba(var(--ion-color-primary-rgb), 0.12);
+  --color: var(--ion-color-primary);
+}
