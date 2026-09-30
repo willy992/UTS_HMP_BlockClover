@@ -18,10 +18,22 @@
 
     <ion-item>
       <ion-icon name="moon-outline" slot="start" aria-hidden="true"></ion-icon>
+
       <ion-label>
-        <h2>Tampilan aplikasi</h2>
-        <p>Atur tema dan preferensi tampilan SIMOBILE.</p>
+        <h2>Dark mode</h2>
+        <p>Gunakan tampilan gelap pada SIMOBILE.</p>
       </ion-label>
+
+      <ion-toggle
+        slot="end"
+        aria-label="Aktifkan dark mode"
+        [(ngModel)]="isDarkMode"
+        (ngModelChange)="setDarkMode($event)"
+      ></ion-toggle>
     </ion-item>
   </ion-list>
+
+  <ion-note color="medium" class="ion-padding-horizontal">
+    Pilihan tema disimpan pada perangkat ini.
+  </ion-note>
 </ion-content>
