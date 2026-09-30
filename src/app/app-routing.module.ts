@@ -3,13 +3,10 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'cart',
-    loadChildren: () => import('./pages/cart/cart.module').then(m => m.CartPageModule)
-  },
-  {
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
-  },  {
+  },
+  {
     path: 'settings',
     loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
   },
@@ -17,7 +14,10 @@ const routes: Routes = [
     path: 'about',
     loadChildren: () => import('./pages/about/about.module').then( m => m.AboutPageModule)
   },
-
+  {
+    path: 'cart',
+    loadChildren: () => import('./pages/cart/cart.module').then(m => m.CartPageModule)
+  },
 ];
 @NgModule({
   imports: [

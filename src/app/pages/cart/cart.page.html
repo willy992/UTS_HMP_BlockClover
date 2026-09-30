@@ -110,10 +110,10 @@
     <ion-button
       *ngIf="!isCartEmpty"
       expand="block"
-      [disabled]="hasStockConflict"
+      [disabled]="hasStockConflict || isCheckingOut"
       (click)="checkout()"
     >
-      Checkout
+      {{ isCheckingOut ? 'Memproses checkout...' : 'Checkout' }}
     </ion-button>
   </div>
 </ion-content>

@@ -1,6 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CartItem } from '../../models/cart-item.model';
 import { CartService } from '../../services/cart.service';
+import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular/lazy';
+import { TransactionService } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-cart',
@@ -16,6 +19,7 @@ export class CartPage implements OnInit, OnDestroy {
   feedbackProductId: number | null = null;
   feedbackActive = false;
   errorFeedbackActive = false;
+  isCheckingOut = false;
 
   private cartHasLoaded = false;
   private readonly knownProductIds = new Set<number>();
@@ -23,7 +27,12 @@ export class CartPage implements OnInit, OnDestroy {
   private feedbackDismissTimer?: ReturnType<typeof setTimeout>;
   private errorFeedbackTimer?: ReturnType<typeof setTimeout>;
 
-  constructor(private readonly cartService: CartService) {}
+  constructor(
+    private readonly cartService: CartService,
+    private readonly transactionService: TransactionService,
+    private readonly router: Router,
+    private readonly toastController: ToastController
+  ) {}
 
   ngOnInit(): void {
     this.refreshCart();
@@ -103,17 +112,64 @@ export class CartPage implements OnInit, OnDestroy {
     }
   }
 
-  checkout(): void {
-    if (this.hasStockConflict) {
+  async checkout(): Promise<void> {
+    if (this.isCheckingOut) {
+      return;
+    }
+
+    const cartSnapshot = this.cartService.getItems();
+
+    if (cartSnapshot.length === 0) {
+      this.showError('Keranjang kosong. Tambahkan produk sebelum checkout.');
+      return;
+    }
+
+    if (cartSnapshot.some((item) => item.quantity > item.product.stock)) {
       this.showError(
         'Stok salah satu produk berubah. Perbarui quantity sebelum checkout.'
       );
       return;
     }
 
-    this.showError(
-      'Checkout akan tersedia setelah TransactionService terintegrasi.'
-    );
+    this.isCheckingOut = true;
+
+    let transaction;
+
+    try {
+      transaction = this.transactionService.checkout(cartSnapshot);
+    } catch {
+      this.showError(
+        'Checkout gagal disimpan. Keranjang tetap dipertahankan, silakan coba lagi.'
+      );
+      this.refreshCart();
+      this.isCheckingOut = false;
+      return;
+    }
+
+    if (!transaction) {
+      this.showError(
+        'Checkout gagal karena stok atau data produk sudah tidak valid. Keranjang tetap dipertahankan.'
+      );
+      this.refreshCart();
+      this.isCheckingOut = false;
+      return;
+    }
+
+    this.cartService.clear();
+    this.refreshCart();
+    void this.presentCheckoutSuccess(transaction.total);
+
+    try {
+      const navigated = await this.router.navigateByUrl('/tabs/transactions');
+
+      if (!navigated) {
+        this.showFeedback(
+          'Checkout berhasil. Transaksi telah masuk ke riwayat transaksi.'
+        );
+      }
+    } finally {
+      this.isCheckingOut = false;
+    }
   }
 
   formatPrice(value: number): string {
@@ -147,6 +203,21 @@ export class CartPage implements OnInit, OnDestroy {
         `${addedItem.product.name} ditambahkan ke keranjang.`,
         addedItem.product.id
       );
+    }
+  }
+
+  private async presentCheckoutSuccess(total: number): Promise<void> {
+    try {
+      const toast = await this.toastController.create({
+        message: `Checkout berhasil: ${this.formatPrice(total)}`,
+        color: 'success',
+        duration: 2200,
+        position: 'top',
+      });
+
+      await toast.present();
+    } catch {
+      this.showFeedback('Checkout berhasil. Transaksi telah dicatat.');
     }
   }
 

@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { CartPage } from './cart.page';
 import { CartService } from '../../services/cart.service';
+import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular/lazy';
+import { TransactionService } from '../../services/transaction.service';
 
 describe('CartPage', () => {
   let cartService: CartService;
@@ -68,5 +71,33 @@ describe('CartPage', () => {
 
     expect(component.feedbackMessage).toContain('dihapus');
     expect(component.isCartEmpty).toBe(true);
+  });
+
+  it('keeps cart items when checkout is rejected', async () => {
+    cartService.add(1);
+
+    const rejectedTransactionService = {
+      checkout: () => undefined,
+    } as unknown as TransactionService;
+
+    component = new CartPage(
+      cartService,
+      rejectedTransactionService,
+      {
+        navigateByUrl: async () => true,
+      } as Router,
+      {
+        create: async () => ({
+          present: async () => undefined,
+        }),
+      } as unknown as ToastController
+    );
+
+    component.ionViewWillEnter();
+
+    await component.checkout();
+
+    expect(component.errorMessage).toContain('Checkout gagal');
+    expect(cartService.getItems()).toHaveLength(1);
   });
 });
