@@ -8,7 +8,11 @@ import { AlertController } from '@ionic/angular/lazy';
   standalone: false,
 })
 export class AppComponent {
-  constructor(private readonly alertController: AlertController) {}
+  private readonly darkModeStorageKey = 'simobile-dark-mode';
+
+  constructor(private readonly alertController: AlertController) {
+    this.restoreTheme();
+  }
 
   async simulateLogout(): Promise<void> {
     const alert = await this.alertController.create({
@@ -19,5 +23,11 @@ export class AppComponent {
     });
 
     await alert.present();
+  }
+
+  private restoreTheme(): void {
+    const isDarkMode = localStorage.getItem(this.darkModeStorageKey) === 'true';
+
+    document.documentElement.classList.toggle('ion-palette-dark', isDarkMode);
   }
 }
