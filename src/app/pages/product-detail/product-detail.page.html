@@ -1,0 +1,57 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/products"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detail Produk</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ng-container *ngIf="product as item; else notFound">
+    <div class="product-image">
+      <img
+        *ngIf="item.imageUrl && !imageUnavailable; else imageFallback"
+        [src]="item.imageUrl"
+        [alt]="item.name"
+        (error)="onImageError()"
+      />
+
+      <ng-template #imageFallback>
+        <ion-icon name="image-outline" aria-hidden="true"></ion-icon>
+        <span>Gambar tidak tersedia</span>
+      </ng-template>
+    </div>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>{{ item.category }}</ion-card-subtitle>
+        <ion-card-title>{{ item.name }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p class="selling-price">{{ formatRupiah(item.sellingPrice) }}</p>
+        <p>Harga beli: {{ formatRupiah(item.purchasePrice) }}</p>
+        <p>Stok tersedia: {{ item.stock }}</p>
+        <p>Terjual: {{ item.sold }}</p>
+
+        <ion-button
+          expand="block"
+          [disabled]="item.stock <= 0"
+          (click)="requestPurchase()"
+        >
+          {{ item.stock > 0 ? 'Beli' : 'Stok Habis' }}
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #notFound>
+    <div class="not-found">
+      <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+      <h2>Produk tidak ditemukan</h2>
+      <p>ID produk tidak valid atau produknya sudah tidak tersedia.</p>
+      <ion-button routerLink="/tabs/products">Kembali ke Produk</ion-button>
+    </div>
+  </ng-template>
+</ion-content>
