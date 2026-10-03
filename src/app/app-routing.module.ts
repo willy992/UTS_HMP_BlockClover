@@ -27,6 +27,13 @@ const routes: Routes = [
       ),
   },
   {
+  path: 'product/:id',
+  loadChildren: () =>
+    import('./pages/product-detail/product-detail.module').then(
+      (m) => m.ProductDetailPageModule
+    ),
+  },
+  {
     path: '',
     loadChildren: () =>
       import('./tabs/tabs.module').then((m) => m.TabsPageModule),
