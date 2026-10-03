@@ -3,11 +3,20 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/products"></ion-back-button>
     </ion-buttons>
-    <ion-title>Tambah Produk</ion-title>
+    <ion-title>{{ isEditMode ? 'Edit Produk' : 'Tambah Produk' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
+   <ng-container *ngIf="productNotFound; else formContent">
+    <div class="not-found">
+      <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+      <h2>Produk tidak ditemukan</h2>
+      <p>ID produk tidak valid atau produknya sudah tidak tersedia.</p>
+      <ion-button routerLink="/tabs/products">Kembali ke Produk</ion-button>
+    </div>
+  </ng-container>
+   <ng-template #formContent>
   <form [formGroup]="productForm" (ngSubmit)="submit()" novalidate>
     <ion-list>
       <ion-item>
@@ -104,7 +113,8 @@
       type="submit"
       [disabled]="productForm.invalid"
     >
-      Simpan Produk
-    </ion-button>
+      {{ isEditMode ? 'Simpan Perubahan' : 'Simpan Produk' }}
+      </ion-button>
   </form>
+  </ng-template>
 </ion-content>
