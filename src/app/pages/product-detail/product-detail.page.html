@@ -1,10 +1,14 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/products"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Detail Produk</ion-title>
-  </ion-toolbar>
+  <ion-buttons slot="start">
+    <ion-back-button defaultHref="/tabs/products"></ion-back-button>
+    <ion-button routerLink="/cart" aria-label="Buka keranjang">
+      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+
+  <ion-title>Detail Produk</ion-title>
+</ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
