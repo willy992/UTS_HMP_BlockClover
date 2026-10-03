@@ -10,6 +10,7 @@ import { ProductService } from '../../services/product.service';
 })
 export class ProductsPage {
   products: Product[] = [];
+  searchQuery = '';
 
   private readonly rupiahFormatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -27,6 +28,18 @@ export class ProductsPage {
 
   private loadProducts(): void {
     this.products = [...this.productService.getAll()];
+  }
+
+  get filteredProducts(): Product[] {
+    const query = this.searchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return this.products;
+    }
+
+    return this.products.filter(product =>
+      `${product.name} ${product.category}`.toLowerCase().includes(query)
+    );
   }
 
   formatRupiah(amount: number): string {

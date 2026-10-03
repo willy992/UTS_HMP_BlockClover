@@ -5,20 +5,25 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-searchbar
+  [(ngModel)]="searchQuery"
+  placeholder="Cari nama atau kategori produk"
+  aria-label="Cari produk"
+></ion-searchbar>
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Produk</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ng-container *ngIf="products.length > 0; else emptyState">
+  <ng-container *ngIf="filteredProducts.length > 0; else emptyState">
     <ion-grid>
       <ion-row>
         <ion-col
-          *ngFor="let product of products"
-          size="12"
-          size-md="6"
-          size-lg="4"
+         *ngFor="let product of filteredProducts"
+         size="12"
+         size-md="6"
+         size-lg="4"
         >
           <ion-card
             button="true"
@@ -44,10 +49,18 @@
   </ng-container>
 
   <ng-template #emptyState>
-    <div class="empty-state">
-      <ion-icon name="cube-outline" aria-hidden="true"></ion-icon>
+  <div class="empty-state">
+    <ion-icon name="cube-outline" aria-hidden="true"></ion-icon>
+
+    <ng-container *ngIf="searchQuery.trim(); else noProducts">
+      <h2>Produk tidak ditemukan</h2>
+      <p>Coba kata kunci lain.</p>
+    </ng-container>
+
+    <ng-template #noProducts>
       <h2>Belum ada produk</h2>
       <p>Produk yang tersedia akan muncul di sini.</p>
-    </div>
-  </ng-template>
+    </ng-template>
+  </div>
+</ng-template>
 </ion-content>
