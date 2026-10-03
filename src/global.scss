@@ -35,3 +35,30 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 @import "@ionic/angular/css/palettes/dark.class.css";
 // @import "@ionic/angular/css/palettes/dark.system.css";
+
+/*
+ * Page transition
+ * -----------------------------------------------------
+ */
+
+@keyframes simobile-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-router-outlet .ion-page:not(.ion-page-hidden) > ion-content {
+  animation: simobile-page-enter 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ion-router-outlet .ion-page:not(.ion-page-hidden) > ion-content {
+    animation: none;
+  }
+}
