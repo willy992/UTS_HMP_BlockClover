@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AlertController } from '@ionic/angular/lazy';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,26 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+  private readonly darkModeStorageKey = 'simobile-dark-mode';
+
+  constructor(private readonly alertController: AlertController) {
+    this.restoreTheme();
+  }
+
+  async simulateLogout(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Logout simulasi',
+      message:
+        'Logout berhasil disimulasikan. Tidak ada akun, sesi, atau data yang dihapus.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+  }
+
+  private restoreTheme(): void {
+    const isDarkMode = localStorage.getItem(this.darkModeStorageKey) === 'true';
+
+    document.documentElement.classList.toggle('ion-palette-dark', isDarkMode);
+  }
 }
