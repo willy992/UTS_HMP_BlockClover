@@ -3,6 +3,8 @@ import { Product, ProductPayload } from '../models/product.model';
 
 @Service()
 export class ProductService {
+    private readonly storageKey = 'simobile.products.v1';
+    private canPersist = true;
     //seeder
     private products: Product[] = [
         {
@@ -117,6 +119,10 @@ export class ProductService {
             sold: 16
         }
     ];
+    
+    constructor() {
+    this.loadSavedProducts();
+}
 
     //get all produk
     getAll(): Product[] {
@@ -151,6 +157,7 @@ export class ProductService {
         };
 
         this.products.push(product);
+        this.saveProducts();
 
         return product;
     }
@@ -169,6 +176,7 @@ export class ProductService {
             ...this.products[index],
             ...payload
         };
+        this.saveProducts();
 
         return this.products[index];
     }
@@ -183,9 +191,111 @@ export class ProductService {
 
         product.stock -= quantity;
         product.sold += quantity;
+        this.saveProducts();
 
         return true;
     }
+    
+    private loadSavedProducts(): void {
+    let savedValue: string | null;
+
+    try {
+        savedValue = localStorage.getItem(this.storageKey);
+    } catch {
+        this.canPersist = false;
+        return;
+    }
+
+    if (savedValue === null) {
+        return;
+    }
+
+    let parsedValue: unknown;
+
+    try {
+        parsedValue = JSON.parse(savedValue);
+    } catch {
+        this.preserveInvalidData(savedValue);
+        return;
+    }
+
+    if (!this.isStoredProducts(parsedValue)) {
+        this.preserveInvalidData(savedValue);
+        return;
+    }
+
+    this.products = parsedValue.products;
+}
+
+private isStoredProducts(
+    value: unknown
+): value is { version: 1; products: Product[] } {
+    if (typeof value !== 'object' || value === null) {
+        return false;
+    }
+
+    const storedValue = value as {
+        version?: unknown;
+        products?: unknown;
+    };
+
+    return (
+        storedValue.version === 1 &&
+        Array.isArray(storedValue.products) &&
+        storedValue.products.every(product => this.isProduct(product))
+    );
+}
+
+private isProduct(value: unknown): value is Product {
+    if (typeof value !== 'object' || value === null) {
+        return false;
+    }
+
+    const product = value as Record<string, unknown>;
+
+    return (
+        Number.isInteger(product['id']) &&
+        typeof product['name'] === 'string' &&
+        typeof product['category'] === 'string' &&
+        typeof product['purchasePrice'] === 'number' &&
+        Number.isFinite(product['purchasePrice']) &&
+        typeof product['sellingPrice'] === 'number' &&
+        Number.isFinite(product['sellingPrice']) &&
+        typeof product['stock'] === 'number' &&
+        Number.isFinite(product['stock']) &&
+        typeof product['sold'] === 'number' &&
+        Number.isFinite(product['sold']) &&
+        (product['imageUrl'] === undefined ||
+            typeof product['imageUrl'] === 'string')
+    );
+}
+
+private preserveInvalidData(rawValue: string): void {
+    try {
+        const recoveryKey = `${this.storageKey}.recovery.${Date.now()}`;
+        localStorage.setItem(recoveryKey, rawValue);
+    } catch {
+        this.canPersist = false;
+    }
+}
+
+private saveProducts(): void {
+    if (!this.canPersist) {
+        return;
+    }
+
+    try {
+        localStorage.setItem(
+            this.storageKey,
+            JSON.stringify({
+                version: 1,
+                products: this.products
+            })
+        );
+    } catch {
+        // Keep the in-memory changes without crashing the app.
+    }
+}
 }
 
 

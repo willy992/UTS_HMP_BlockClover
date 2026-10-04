@@ -1,0 +1,120 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/products"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Edit Produk' : 'Tambah Produk' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+   <ng-container *ngIf="productNotFound; else formContent">
+    <div class="not-found">
+      <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+      <h2>Produk tidak ditemukan</h2>
+      <p>ID produk tidak valid atau produknya sudah tidak tersedia.</p>
+      <ion-button routerLink="/tabs/products">Kembali ke Produk</ion-button>
+    </div>
+  </ng-container>
+   <ng-template #formContent>
+  <form [formGroup]="productForm" (ngSubmit)="submit()" novalidate>
+    <ion-list>
+      <ion-item>
+        <ion-input
+          label="Nama produk"
+          labelPlacement="stacked"
+          formControlName="name"
+        ></ion-input>
+      </ion-item>
+      <ion-note
+        color="danger"
+        *ngIf="productForm.controls.name.touched && productForm.controls.name.invalid"
+      >
+        Nama produk wajib diisi.
+      </ion-note>
+
+      <ion-item>
+        <ion-input
+          label="Kategori"
+          labelPlacement="stacked"
+          formControlName="category"
+        ></ion-input>
+      </ion-item>
+      <ion-note
+        color="danger"
+        *ngIf="productForm.controls.category.touched && productForm.controls.category.invalid"
+      >
+        Kategori wajib diisi.
+      </ion-note>
+
+      <ion-item>
+        <ion-input
+          label="Harga beli"
+          labelPlacement="stacked"
+          type="number"
+          min="1"
+          step="1"
+          formControlName="purchasePrice"
+        ></ion-input>
+      </ion-item>
+      <ion-note
+        color="danger"
+        *ngIf="productForm.controls.purchasePrice.touched && productForm.controls.purchasePrice.invalid"
+      >
+        Harga beli wajib berupa angka minimal 1.
+      </ion-note>
+
+      <ion-item>
+        <ion-input
+          label="Harga jual"
+          labelPlacement="stacked"
+          type="number"
+          min="1"
+          step="1"
+          formControlName="sellingPrice"
+        ></ion-input>
+      </ion-item>
+      <ion-note
+        color="danger"
+        *ngIf="productForm.controls.sellingPrice.touched && productForm.controls.sellingPrice.invalid"
+      >
+        Harga jual wajib berupa angka minimal 1.
+      </ion-note>
+
+      <ion-item>
+        <ion-input
+          label="Stok"
+          labelPlacement="stacked"
+          type="number"
+          min="0"
+          step="1"
+          formControlName="stock"
+        ></ion-input>
+      </ion-item>
+      <ion-note
+        color="danger"
+        *ngIf="productForm.controls.stock.touched && productForm.controls.stock.invalid"
+      >
+        Stok wajib berupa bilangan bulat minimal 0.
+      </ion-note>
+
+      <ion-item>
+        <ion-input
+          label="URL gambar (opsional)"
+          labelPlacement="stacked"
+          formControlName="imageUrl"
+        ></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button
+      class="submit-button"
+      expand="block"
+      type="submit"
+      [disabled]="productForm.invalid"
+    >
+      {{ isEditMode ? 'Simpan Perubahan' : 'Simpan Produk' }}
+      </ion-button>
+  </form>
+  </ng-template>
+</ion-content>
