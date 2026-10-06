@@ -27,11 +27,25 @@ const routes: Routes = [
       ),
   },
   {
-  path: 'product/:id',
-  loadChildren: () =>
-    import('./pages/product-detail/product-detail.module').then(
-      (m) => m.ProductDetailPageModule
-    ),
+    path: 'product/new',
+    loadChildren: () =>
+      import('./pages/product-form/product-form.module').then(
+        (m) => m.ProductFormPageModule,
+      ),
+  },
+  {
+    path: 'product/:id/edit',
+    loadChildren: () =>
+      import('./pages/product-form/product-form.module').then(
+        (m) => m.ProductFormPageModule,
+      ),
+  },
+  {
+    path: 'product/:id',
+    loadChildren: () =>
+      import('./pages/product-detail/product-detail.module').then(
+        (m) => m.ProductDetailPageModule,
+      ),
   },
   {
     path: '',
