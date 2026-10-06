@@ -1,19 +1,40 @@
 import { TestBed } from '@angular/core/testing';
-import { CartPage } from './cart.page';
-import { CartService } from '../../services/cart.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular/lazy';
+
+import { CartService } from '../../services/cart.service';
 import { TransactionService } from '../../services/transaction.service';
+import { CartPage } from './cart.page';
 
 describe('CartPage', () => {
   let cartService: CartService;
+  let transactionService: TransactionService;
   let component: CartPage;
 
+  const routerMock = {
+    navigateByUrl: async () => true,
+  } as unknown as Router;
+
+  const toastControllerMock = {
+    create: async () => ({
+      present: async () => undefined,
+    }),
+  } as unknown as ToastController;
+
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({});
+
     cartService = TestBed.inject(CartService);
+    transactionService = TestBed.inject(TransactionService);
     cartService.clear();
-    component = new CartPage(cartService);
+
+    component = new CartPage(
+      cartService,
+      transactionService,
+      routerMock,
+      toastControllerMock,
+    );
     component.ngOnInit();
   });
 
@@ -42,17 +63,7 @@ describe('CartPage', () => {
     expect(component.items[0].quantity).toBe(1);
   });
 
-  it('does not create a transaction when checkout is pressed', () => {
-    cartService.add(1);
-    component.ionViewWillEnter();
-
-    component.checkout();
-
-    expect(component.errorMessage).toContain('TransactionService');
-    expect(cartService.getItems()).toHaveLength(1);
-  });
-
-    it('shows visual feedback after a quantity change', () => {
+  it('shows visual feedback after a quantity change', () => {
     cartService.add(1);
     component.ionViewWillEnter();
 
@@ -73,6 +84,16 @@ describe('CartPage', () => {
     expect(component.isCartEmpty).toBe(true);
   });
 
+  it('clears the cart after a successful checkout', async () => {
+    cartService.add(1);
+    component.ionViewWillEnter();
+
+    await component.checkout();
+
+    expect(cartService.getItems()).toEqual([]);
+    expect(transactionService.getAll()).toHaveLength(1);
+  });
+
   it('keeps cart items when checkout is rejected', async () => {
     cartService.add(1);
 
@@ -83,16 +104,9 @@ describe('CartPage', () => {
     component = new CartPage(
       cartService,
       rejectedTransactionService,
-      {
-        navigateByUrl: async () => true,
-      } as Router,
-      {
-        create: async () => ({
-          present: async () => undefined,
-        }),
-      } as unknown as ToastController
+      routerMock,
+      toastControllerMock,
     );
-
     component.ionViewWillEnter();
 
     await component.checkout();
