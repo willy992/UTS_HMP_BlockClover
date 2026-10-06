@@ -111,7 +111,7 @@ describe('CartPage', () => {
 
     await component.checkout();
 
-    expect(component.errorMessage).toContain('Checkout gagal');
+    expect(component.errorMessage).toContain('Transaksi gagal');
     expect(cartService.getItems()).toHaveLength(1);
   });
 });

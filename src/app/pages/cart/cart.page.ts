@@ -120,13 +120,15 @@ export class CartPage implements OnInit, OnDestroy {
     const cartSnapshot = this.cartService.getItems();
 
     if (cartSnapshot.length === 0) {
-      this.showError('Keranjang kosong. Tambahkan produk sebelum checkout.');
+      this.showError(
+        'Keranjang kosong. Tambahkan produk sebelum mengonfirmasi transaksi.'
+      );
       return;
     }
 
     if (cartSnapshot.some((item) => item.quantity > item.product.stock)) {
       this.showError(
-        'Stok salah satu produk berubah. Perbarui quantity sebelum checkout.'
+        'Stok salah satu produk berubah. Perbarui quantity sebelum mengonfirmasi transaksi.'
       );
       return;
     }
@@ -139,7 +141,7 @@ export class CartPage implements OnInit, OnDestroy {
       transaction = this.transactionService.checkout(cartSnapshot);
     } catch {
       this.showError(
-        'Checkout gagal disimpan. Keranjang tetap dipertahankan, silakan coba lagi.'
+        'Transaksi gagal disimpan. Keranjang tetap dipertahankan, silakan coba lagi.'
       );
       this.refreshCart();
       this.isCheckingOut = false;
@@ -148,7 +150,7 @@ export class CartPage implements OnInit, OnDestroy {
 
     if (!transaction) {
       this.showError(
-        'Checkout gagal karena stok atau data produk sudah tidak valid. Keranjang tetap dipertahankan.'
+        'Transaksi gagal karena stok atau data produk sudah tidak valid. Keranjang tetap dipertahankan.'
       );
       this.refreshCart();
       this.isCheckingOut = false;
@@ -164,7 +166,7 @@ export class CartPage implements OnInit, OnDestroy {
 
       if (!navigated) {
         this.showFeedback(
-          'Checkout berhasil. Transaksi telah masuk ke riwayat transaksi.'
+          'Transaksi berhasil dan telah masuk ke riwayat.'
         );
       }
     } finally {
@@ -209,7 +211,7 @@ export class CartPage implements OnInit, OnDestroy {
   private async presentCheckoutSuccess(total: number): Promise<void> {
     try {
       const toast = await this.toastController.create({
-        message: `Checkout berhasil: ${this.formatPrice(total)}`,
+        message: `Transaksi berhasil: ${this.formatPrice(total)}`,
         color: 'success',
         duration: 2200,
         position: 'top',
@@ -217,7 +219,7 @@ export class CartPage implements OnInit, OnDestroy {
 
       await toast.present();
     } catch {
-      this.showFeedback('Checkout berhasil. Transaksi telah dicatat.');
+      this.showFeedback('Transaksi berhasil dicatat.');
     }
   }
 

@@ -1,13 +1,13 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Settings</ion-title>
+    <ion-title>Pengaturan</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Settings</ion-title>
+      <ion-title size="large">Pengaturan</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -20,13 +20,13 @@
       <ion-icon name="moon-outline" slot="start" aria-hidden="true"></ion-icon>
 
       <ion-label>
-        <h2>Dark mode</h2>
+        <h2>Mode gelap</h2>
         <p>Gunakan tampilan gelap pada SIMOBILE.</p>
       </ion-label>
 
       <ion-toggle
         slot="end"
-        aria-label="Aktifkan dark mode"
+        aria-label="Aktifkan mode gelap"
         [(ngModel)]="isDarkMode"
         (ngModelChange)="setDarkMode($event)"
       ></ion-toggle>

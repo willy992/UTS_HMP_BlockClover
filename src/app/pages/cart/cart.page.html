@@ -30,7 +30,7 @@
     <ion-card color="warning" *ngIf="hasStockConflict">
       <ion-card-content>
         Stok berubah setelah produk masuk ke keranjang. Sesuaikan quantity sebelum
-        checkout.
+        mengonfirmasi transaksi.
       </ion-card-content>
     </ion-card>
 
@@ -113,7 +113,11 @@
       [disabled]="hasStockConflict || isCheckingOut"
       (click)="checkout()"
     >
-      {{ isCheckingOut ? 'Memproses checkout...' : 'Checkout' }}
+      {{
+        isCheckingOut
+          ? 'Memproses transaksi...'
+          : 'Konfirmasi Transaksi'
+      }}
     </ion-button>
   </div>
 </ion-content>
