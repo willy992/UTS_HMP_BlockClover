@@ -66,12 +66,17 @@ export class TransactionService {
       total: lines.reduce((total, line) => total + line.subtotal, 0),
     };
 
+    const nextTransactions = [transaction, ...this.transactions];
+
+    if (!this.persistTransactions(nextTransactions)) {
+      return undefined;
+    }
+
     for (const line of lines) {
       this.productService.reduceStock(line.productId, line.quantity);
     }
 
-    this.transactions.unshift(transaction);
-    this.persistTransactions();
+    this.transactions = nextTransactions;
 
     return this.cloneTransaction(transaction);
   }
@@ -136,19 +141,30 @@ export class TransactionService {
     try {
       const parsedTransactions: unknown = JSON.parse(savedTransactions);
 
-      return Array.isArray(parsedTransactions)
-        ? parsedTransactions as Transaction[]
+      return Array.isArray(parsedTransactions) &&
+        parsedTransactions.every((transaction) =>
+          this.isTransaction(transaction)
+        )
+        ? parsedTransactions
         : [];
     } catch {
       return [];
     }
   }
 
-  private persistTransactions(): void {
-    this.getStorage()?.setItem(
-      this.storageKey,
-      JSON.stringify(this.transactions)
-    );
+  private persistTransactions(transactions: Transaction[]): boolean {
+    const storage = this.getStorage();
+
+    if (!storage) {
+      return true;
+    }
+
+    try {
+      storage.setItem(this.storageKey, JSON.stringify(transactions));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private getStorage(): Storage | undefined {
@@ -161,6 +177,49 @@ export class TransactionService {
 
   private isToday(dateValue: string): boolean {
     return new Date(dateValue).toDateString() === new Date().toDateString();
+  }
+
+  private isTransaction(value: unknown): value is Transaction {
+    if (typeof value !== 'object' || value === null) {
+      return false;
+    }
+
+    const transaction = value as Record<string, unknown>;
+
+    return (
+      typeof transaction['id'] === 'string' &&
+      transaction['id'].length > 0 &&
+      typeof transaction['createdAt'] === 'string' &&
+      Number.isFinite(Date.parse(transaction['createdAt'])) &&
+      Array.isArray(transaction['lines']) &&
+      transaction['lines'].length > 0 &&
+      transaction['lines'].every((line) => this.isTransactionLine(line)) &&
+      typeof transaction['total'] === 'number' &&
+      Number.isFinite(transaction['total']) &&
+      transaction['total'] >= 0
+    );
+  }
+
+  private isTransactionLine(value: unknown): value is TransactionLine {
+    if (typeof value !== 'object' || value === null) {
+      return false;
+    }
+
+    const line = value as Record<string, unknown>;
+
+    return (
+      Number.isSafeInteger(line['productId']) &&
+      typeof line['productName'] === 'string' &&
+      line['productName'].length > 0 &&
+      typeof line['price'] === 'number' &&
+      Number.isFinite(line['price']) &&
+      line['price'] > 0 &&
+      Number.isSafeInteger(line['quantity']) &&
+      (line['quantity'] as number) > 0 &&
+      typeof line['subtotal'] === 'number' &&
+      Number.isFinite(line['subtotal']) &&
+      line['subtotal'] > 0
+    );
   }
 
   private cloneTransaction(transaction: Transaction): Transaction {

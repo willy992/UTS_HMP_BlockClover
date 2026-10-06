@@ -49,4 +49,18 @@ describe('TransactionService', () => {
     expect(service.getAll()).toEqual([]);
     expect(productService.getById(1)?.stock).toBe(14);
   });
+
+  it('ignores invalid transaction data from local storage', () => {
+    TestBed.resetTestingModule();
+    localStorage.setItem(
+      'simobile-transactions',
+      JSON.stringify([{ id: 'invalid-transaction' }]),
+    );
+    TestBed.configureTestingModule({});
+
+    const reloadedService = TestBed.inject(TransactionService);
+
+    expect(reloadedService.getAll()).toEqual([]);
+    expect(reloadedService.getTodayCount()).toBe(0);
+  });
 });
