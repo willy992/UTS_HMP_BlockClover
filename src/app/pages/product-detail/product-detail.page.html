@@ -15,16 +15,10 @@
   <ng-container *ngIf="product as item; else notFound">
     <div class="product-image">
       <img
-        *ngIf="item.imageUrl && !imageUnavailable; else imageFallback"
-        [src]="item.imageUrl"
+        [src]="productImageUrl"
         [alt]="item.name"
         (error)="onImageError()"
       />
-
-      <ng-template #imageFallback>
-        <ion-icon name="image-outline" aria-hidden="true"></ion-icon>
-        <span>Gambar tidak tersedia</span>
-      </ng-template>
     </div>
 
     <ion-card>

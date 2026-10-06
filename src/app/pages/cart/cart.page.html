@@ -45,11 +45,10 @@
       <ion-item *ngFor="let item of items; trackBy: trackByProductId" [class.item-feedback]="feedbackProductId === item.product.id && feedbackActive">
         <ion-thumbnail slot="start">
           <img
-            *ngIf="item.product.imageUrl"
-            [src]="item.product.imageUrl"
+            [src]="getProductImageUrl(item.product)"
             [alt]="item.product.name"
+            (error)="onProductImageError(item.product.id)"
           />
-          <ion-icon *ngIf="!item.product.imageUrl" name="cube-outline"></ion-icon>
         </ion-thumbnail>
 
         <ion-label>

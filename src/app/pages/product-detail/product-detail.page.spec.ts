@@ -42,4 +42,12 @@ describe('ProductDetailPage', () => {
     expect(component).toBeTruthy();
     expect(component.product?.id).toBe(1);
   });
+
+  it('should use the fallback image after an image error', () => {
+    component.onImageError();
+
+    expect(component.productImageUrl).toBe(
+      'assets/products/placeholder.svg',
+    );
+  });
 });

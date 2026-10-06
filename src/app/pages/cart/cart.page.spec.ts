@@ -84,6 +84,16 @@ describe('CartPage', () => {
     expect(component.isCartEmpty).toBe(true);
   });
 
+  it('uses the fallback image after a product image fails', () => {
+    const product = TestBed.inject(CartService).add(1).product;
+
+    component.onProductImageError(product.id);
+
+    expect(component.getProductImageUrl(product)).toBe(
+      'assets/products/placeholder.svg',
+    );
+  });
+
   it('clears the cart after a successful checkout', async () => {
     cartService.add(1);
     component.ionViewWillEnter();

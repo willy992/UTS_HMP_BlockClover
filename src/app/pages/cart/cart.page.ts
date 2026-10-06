@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CartItem } from '../../models/cart-item.model';
+import { Product } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular/lazy';
@@ -12,6 +13,7 @@ import { TransactionService } from '../../services/transaction.service';
   standalone: false,
 })
 export class CartPage implements OnInit, OnDestroy {
+  readonly fallbackImageUrl = 'assets/products/placeholder.svg';
   items: CartItem[] = [];
   total = 0;
   errorMessage = '';
@@ -23,6 +25,7 @@ export class CartPage implements OnInit, OnDestroy {
 
   private cartHasLoaded = false;
   private readonly knownProductIds = new Set<number>();
+  private readonly unavailableProductImageIds = new Set<number>();
   private feedbackStartTimer?: ReturnType<typeof setTimeout>;
   private feedbackDismissTimer?: ReturnType<typeof setTimeout>;
   private errorFeedbackTimer?: ReturnType<typeof setTimeout>;
@@ -184,6 +187,16 @@ export class CartPage implements OnInit, OnDestroy {
 
   trackByProductId(_: number, item: CartItem): number {
     return item.product.id;
+  }
+
+  getProductImageUrl(product: Product): string {
+    return product.imageUrl && !this.unavailableProductImageIds.has(product.id)
+      ? product.imageUrl
+      : this.fallbackImageUrl;
+  }
+
+  onProductImageError(productId: number): void {
+    this.unavailableProductImageIds.add(productId);
   }
 
   private refreshCart(): void {

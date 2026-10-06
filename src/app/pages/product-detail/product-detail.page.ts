@@ -12,8 +12,15 @@ import { CartService } from '../../services/cart.service';
   standalone: false,
 })
 export class ProductDetailPage implements OnInit {
+  readonly fallbackImageUrl = 'assets/products/placeholder.svg';
   product?: Product;
   imageUnavailable = false;
+
+  get productImageUrl(): string {
+    return this.product?.imageUrl && !this.imageUnavailable
+      ? this.product.imageUrl
+      : this.fallbackImageUrl;
+  }
 
   async requestPurchase(): Promise<void> {
   if (!this.product || this.product.stock <= 0) {

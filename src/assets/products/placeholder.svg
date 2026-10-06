@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title description">
+  <title id="title">Gambar produk tidak tersedia</title>
+  <desc id="description">Ilustrasi kotak produk sebagai gambar pengganti.</desc>
+  <rect width="600" height="400" fill="#e8edf5" />
+  <rect x="210" y="92" width="180" height="156" rx="18" fill="#2563eb" opacity="0.14" />
+  <path d="M230 142 300 105l70 37-70 38-70-38Z" fill="#2563eb" />
+  <path d="M230 142v78l70 38v-78l-70-38Z" fill="#1d4ed8" />
+  <path d="M370 142v78l-70 38v-78l70-38Z" fill="#0f9488" />
+  <text x="300" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#334155">
+    Gambar produk belum tersedia
+  </text>
+</svg>
