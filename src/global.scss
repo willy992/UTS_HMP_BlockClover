@@ -57,6 +57,43 @@ ion-router-outlet .ion-page:not(.ion-page-hidden) > ion-content {
   animation: simobile-page-enter 220ms ease-out both;
 }
 
+/* Shared cart action used by product list and product detail toolbars. */
+.cart-toolbar-actions {
+  margin-right: 60px;
+}
+
+.cart-toolbar-button {
+  font-weight: 600;
+
+  --padding-end: 10px;
+  --padding-start: 10px;
+
+  ion-icon {
+    font-size: 1.35rem;
+  }
+}
+
+.cart-toolbar-badge {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  justify-content: center;
+  margin-left: 7px;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 2px 6px;
+}
+
+@media (max-width: 480px) {
+  .cart-toolbar-actions {
+    margin-right: 60px;
+  }
+
+  .cart-toolbar-label {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   ion-router-outlet .ion-page:not(.ion-page-hidden) > ion-content {
     animation: none;

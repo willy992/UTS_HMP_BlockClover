@@ -46,8 +46,6 @@ describe('ProductDetailPage', () => {
   it('should use the fallback image after an image error', () => {
     component.onImageError();
 
-    expect(component.productImageUrl).toBe(
-      'assets/products/placeholder.svg',
-    );
+    expect(component.productImageUrl).toContain('data:image/svg+xml');
   });
 });

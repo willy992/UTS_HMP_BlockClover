@@ -1,6 +1,19 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Produk</ion-title>
+    <ion-buttons slot="end" class="cart-toolbar-actions">
+      <ion-button
+        class="cart-toolbar-button"
+        routerLink="/cart"
+        [attr.aria-label]="'Buka keranjang, ' + cartItemCount + ' barang'"
+      >
+        <ion-icon slot="start" name="cart-outline"></ion-icon>
+        <span class="cart-toolbar-label">Keranjang</span>
+        <ion-badge color="secondary" class="cart-toolbar-badge">
+          {{ cartItemCount }}
+        </ion-badge>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -20,17 +33,26 @@
     <ion-grid>
       <ion-row>
         <ion-col
-          *ngFor="let product of filteredProducts"
+          *ngFor="let product of filteredProducts; trackBy: trackByProductId"
           size="12"
           size-md="6"
           size-lg="4"
         >
-          <ion-card
-            button="true"
-            [routerLink]="['/product', product.id]"
-            class="product-card"
-          >
-            <ion-card-header>
+          <ion-card class="product-card">
+            <a
+              class="product-link"
+              [routerLink]="['/product', product.id]"
+              [attr.aria-label]="'Buka detail ' + product.name"
+            >
+              <img
+                class="product-image"
+                [src]="getProductImageUrl(product)"
+                [alt]="product.name"
+                (error)="onImageError(product.id)"
+              />
+            </a>
+
+            <ion-card-header [routerLink]="['/product', product.id]">
               <ion-card-subtitle>{{ product.category }}</ion-card-subtitle>
               <ion-card-title>{{ product.name }}</ion-card-title>
             </ion-card-header>
@@ -39,8 +61,22 @@
               <p class="product-price">
                 {{ formatRupiah(product.sellingPrice) }}
               </p>
-              <p>Stok: {{ product.stock }}</p>
+              <div class="stock-row">
+                <p>Stok: {{ product.stock }}</p>
+                <ion-badge *ngIf="product.stock === 0" color="danger">
+                  Habis
+                </ion-badge>
+              </div>
               <p>Terjual: {{ product.sold }}</p>
+
+              <ion-button
+                expand="block"
+                [disabled]="product.stock === 0"
+                (click)="addToCart($event, product)"
+              >
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                {{ product.stock > 0 ? 'Tambah ke Keranjang' : 'Stok Habis' }}
+              </ion-button>
             </ion-card-content>
           </ion-card>
         </ion-col>
@@ -64,7 +100,12 @@
     </div>
   </ng-template>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed"
+    class="add-product-fab"
+  >
     <ion-fab-button routerLink="/product/new" aria-label="Tambah produk baru">
       <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
     </ion-fab-button>

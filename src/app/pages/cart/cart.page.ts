@@ -5,6 +5,8 @@ import { CartService } from '../../services/cart.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular/lazy';
 import { TransactionService } from '../../services/transaction.service';
+import { Subscription } from 'rxjs';
+import { createProductImageDataUrl } from '../../utils/product-image.util';
 
 @Component({
   selector: 'app-cart',
@@ -13,7 +15,6 @@ import { TransactionService } from '../../services/transaction.service';
   standalone: false,
 })
 export class CartPage implements OnInit, OnDestroy {
-  readonly fallbackImageUrl = 'assets/products/placeholder.svg';
   items: CartItem[] = [];
   total = 0;
   errorMessage = '';
@@ -29,6 +30,7 @@ export class CartPage implements OnInit, OnDestroy {
   private feedbackStartTimer?: ReturnType<typeof setTimeout>;
   private feedbackDismissTimer?: ReturnType<typeof setTimeout>;
   private errorFeedbackTimer?: ReturnType<typeof setTimeout>;
+  private cartSubscription?: Subscription;
 
   constructor(
     private readonly cartService: CartService,
@@ -38,10 +40,13 @@ export class CartPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.refreshCart();
+    this.cartSubscription = this.cartService.items$.subscribe(() => {
+      this.refreshCart();
+    });
   }
 
   ngOnDestroy(): void {
+    this.cartSubscription?.unsubscribe();
     this.clearTimers();
   }
 
@@ -192,7 +197,7 @@ export class CartPage implements OnInit, OnDestroy {
   getProductImageUrl(product: Product): string {
     return product.imageUrl && !this.unavailableProductImageIds.has(product.id)
       ? product.imageUrl
-      : this.fallbackImageUrl;
+      : createProductImageDataUrl(product);
   }
 
   onProductImageError(productId: number): void {

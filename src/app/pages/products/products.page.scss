@@ -1,6 +1,30 @@
 .product-card {
   height: 100%;
   margin: 0;
+  overflow: hidden;
+}
+
+.product-link {
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  display: block;
+  height: 170px;
+}
+
+.product-image {
+  height: 100%;
+  object-fit: contain;
+  padding: 12px;
+  width: 100%;
+}
+
+.stock-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+
+  p {
+    margin: 0;
+  }
 }
 
 .product-price {
@@ -23,4 +47,8 @@
   ion-icon {
     font-size: 3rem;
   }
+}
+
+.add-product-fab {
+  margin-bottom: 8px;
 }

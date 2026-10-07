@@ -89,8 +89,8 @@ describe('CartPage', () => {
 
     component.onProductImageError(product.id);
 
-    expect(component.getProductImageUrl(product)).toBe(
-      'assets/products/placeholder.svg',
+    expect(component.getProductImageUrl(product)).toContain(
+      'data:image/svg+xml',
     );
   });
 

@@ -1,14 +1,25 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-  <ion-buttons slot="start">
-    <ion-back-button defaultHref="/tabs/products"></ion-back-button>
-    <ion-button routerLink="/cart" aria-label="Buka keranjang">
-      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-    </ion-button>
-  </ion-buttons>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/products"></ion-back-button>
+    </ion-buttons>
 
-  <ion-title>Detail Produk</ion-title>
-</ion-toolbar>
+    <ion-title>Detail Produk</ion-title>
+
+    <ion-buttons slot="end" class="cart-toolbar-actions">
+      <ion-button
+        class="cart-toolbar-button"
+        routerLink="/cart"
+        [attr.aria-label]="'Buka keranjang, ' + cartItemCount + ' barang'"
+      >
+        <ion-icon slot="start" name="cart-outline"></ion-icon>
+        <span class="cart-toolbar-label">Keranjang</span>
+        <ion-badge color="secondary" class="cart-toolbar-badge">
+          {{ cartItemCount }}
+        </ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -42,12 +53,12 @@
         </ion-button>
 
         <ion-button
-  expand="block"
-  fill="outline"
-  [routerLink]="['/product', item.id, 'edit']"
->
-  Edit Produk
-</ion-button>
+          expand="block"
+          fill="outline"
+          [routerLink]="['/product', item.id, 'edit']"
+        >
+          Edit Produk
+        </ion-button>
       </ion-card-content>
     </ion-card>
   </ng-container>
