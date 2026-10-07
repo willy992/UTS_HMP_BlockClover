@@ -27,9 +27,15 @@ describe('DashboardPage', () => {
   it('should show the dashboard summary from services', () => {
     component.ionViewWillEnter();
 
+    expect(component.availableProducts).toBe(11);
     expect(component.totalProducts).toBe(12);
     expect(component.todayTransactionCount).toBe(0);
     expect(component.todayTotal).toBe(0);
-    expect(component.todayBestSellerQuantity).toBe(0);
+    expect(component.todayProfit).toBe(0);
+    expect(component.topProducts.map((product) => product.name)).toEqual([
+      'Mi Instan Goreng',
+      'Air Mineral 600 ml',
+      'Kopi Sachet',
+    ]);
   });
 });

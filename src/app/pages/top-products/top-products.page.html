@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Peringkat Produk</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list inset="true">
+    <ion-item
+      *ngFor="let product of products; let rank = index; trackBy: trackByProductId"
+      [routerLink]="['/product', product.id]"
+      button="true"
+      detail="true"
+    >
+      <ion-badge
+        slot="start"
+        [color]="rank < 3 ? 'secondary' : 'medium'"
+        class="rank-badge"
+      >
+        {{ rank + 1 }}
+      </ion-badge>
+      <ion-label>
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.category }}</p>
+        <p>
+          <strong>{{ product.sold }}</strong> terjual · sisa stok
+          <strong>{{ product.stock }}</strong>
+        </p>
+      </ion-label>
+      <ion-badge *ngIf="product.stock === 0" slot="end" color="danger">
+        Habis
+      </ion-badge>
+    </ion-item>
+  </ion-list>
+</ion-content>

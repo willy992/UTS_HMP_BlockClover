@@ -27,6 +27,27 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'sales-report/transaction/:id',
+    loadChildren: () =>
+      import('./pages/sales-report-detail/sales-report-detail.module').then(
+        (m) => m.SalesReportDetailPageModule,
+      ),
+  },
+  {
+    path: 'sales-report',
+    loadChildren: () =>
+      import('./pages/sales-report/sales-report.module').then(
+        (m) => m.SalesReportPageModule,
+      ),
+  },
+  {
+    path: 'top-products',
+    loadChildren: () =>
+      import('./pages/top-products/top-products.module').then(
+        (m) => m.TopProductsPageModule,
+      ),
+  },
+  {
     path: 'product/new',
     loadChildren: () =>
       import('./pages/product-form/product-form.module').then(

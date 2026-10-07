@@ -14,43 +14,62 @@
   <ion-grid class="summary-grid">
     <ion-row>
       <ion-col size="12" size-md="6">
-        <ion-card class="summary-card">
+        <ion-card class="summary-card" button="true" routerLink="/tabs/products">
           <ion-card-header>
-            <ion-card-subtitle>Jumlah Produk</ion-card-subtitle>
-            <ion-card-title>{{ totalProducts }}</ion-card-title>
+            <ion-card-subtitle>Produk Tersedia</ion-card-subtitle>
+            <ion-card-title>
+              {{ availableProducts }} / {{ totalProducts }}
+            </ion-card-title>
           </ion-card-header>
-          <ion-card-content>Produk terdaftar di aplikasi.</ion-card-content>
+          <ion-card-content>
+            Produk tersedia dari seluruh produk. Ketuk untuk melihat produk.
+          </ion-card-content>
         </ion-card>
       </ion-col>
 
       <ion-col size="12" size-md="6">
-        <ion-card class="summary-card">
+        <ion-card
+          class="summary-card"
+          button="true"
+          routerLink="/tabs/transactions"
+        >
           <ion-card-header>
             <ion-card-subtitle>Transaksi Hari Ini</ion-card-subtitle>
             <ion-card-title>{{ todayTransactionCount }}</ion-card-title>
           </ion-card-header>
-          <ion-card-content>Transaksi yang dikonfirmasi hari ini.</ion-card-content>
+          <ion-card-content>
+            Transaksi yang dikonfirmasi hari ini. Ketuk untuk melihat riwayat.
+          </ion-card-content>
         </ion-card>
       </ion-col>
 
       <ion-col size="12" size-md="6">
-        <ion-card class="summary-card">
+        <ion-card class="summary-card" button="true" routerLink="/sales-report">
           <ion-card-header>
             <ion-card-subtitle>Total Hari Ini</ion-card-subtitle>
             <ion-card-title>{{ formatRupiah(todayTotal) }}</ion-card-title>
           </ion-card-header>
-          <ion-card-content>Total nilai transaksi hari ini.</ion-card-content>
+          <ion-card-content class="financial-summary">
+            <span>Omzet hari ini</span>
+            <strong>Keuntungan {{ formatRupiah(todayProfit) }}</strong>
+            <small>Ketuk untuk membuka laporan admin.</small>
+          </ion-card-content>
         </ion-card>
       </ion-col>
 
       <ion-col size="12" size-md="6">
-        <ion-card class="summary-card">
+        <ion-card class="summary-card top-products-card" button="true" routerLink="/top-products">
           <ion-card-header>
-            <ion-card-subtitle>Produk Terlaris Hari Ini</ion-card-subtitle>
-            <ion-card-title>{{ todayBestSellerName }}</ion-card-title>
+            <ion-card-subtitle>3 Produk Terlaris</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            {{ todayBestSellerQuantity }} barang terjual hari ini.
+            <ol>
+              <li *ngFor="let product of topProducts">
+                <span>{{ product.name }}</span>
+                <strong>{{ product.sold }} terjual</strong>
+              </li>
+            </ol>
+            <small>Ketuk untuk melihat peringkat lengkap dan sisa stok.</small>
           </ion-card-content>
         </ion-card>
       </ion-col>

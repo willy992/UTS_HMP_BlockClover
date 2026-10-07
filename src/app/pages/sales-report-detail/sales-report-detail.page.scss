@@ -1,0 +1,29 @@
+.transaction-summary ion-card-content {
+  display: grid;
+  gap: 10px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.profit {
+  color: var(--ion-color-success);
+  font-weight: 700;
+}
+
+.empty-state {
+  align-items: center;
+  color: var(--ion-color-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+  text-align: center;
+
+  ion-icon {
+    font-size: 4rem;
+  }
+}

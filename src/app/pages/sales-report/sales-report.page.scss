@@ -1,0 +1,43 @@
+.today-summary {
+  padding: 8px;
+
+  ion-card {
+    border-top: 4px solid var(--ion-color-secondary);
+    height: 100%;
+    margin: 8px;
+  }
+}
+
+.report-day {
+  display: block;
+  margin-bottom: 28px;
+}
+
+.day-total-card ion-card-content {
+  display: grid;
+  gap: 10px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.profit {
+  color: var(--ion-color-success);
+}
+
+.empty-state {
+  align-items: center;
+  color: var(--ion-color-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 2rem;
+  text-align: center;
+
+  ion-icon {
+    font-size: 4rem;
+  }
+}

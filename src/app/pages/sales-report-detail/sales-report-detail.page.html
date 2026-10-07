@@ -1,0 +1,53 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/sales-report" text="Laporan">
+      </ion-back-button>
+    </ion-buttons>
+    <ion-title>Detail Laporan</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ng-container *ngIf="transaction as item; else notFound">
+    <ion-card class="transaction-summary">
+      <ion-card-header>
+        <ion-card-subtitle>{{ formatDate(item.createdAt) }}</ion-card-subtitle>
+        <ion-card-title>{{ item.id }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div><span>Total penjualan</span><strong>{{ formatRupiah(item.total) }}</strong></div>
+        <div><span>Total keuntungan</span><strong class="profit">{{ formatRupiah(item.profit) }}</strong></div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list inset="true">
+      <ion-list-header>
+        <ion-label>Penjualan dan Keuntungan per Produk</ion-label>
+      </ion-list-header>
+
+      <ion-item *ngFor="let line of item.lines">
+        <ion-label>
+          <h2>
+            {{ line.productName }}
+            <ion-badge *ngIf="isOutOfStock(line.productId)" color="danger">
+              Habis
+            </ion-badge>
+          </h2>
+          <p>{{ line.quantity }} × {{ formatRupiah(line.price) }}</p>
+          <p>Modal: {{ formatRupiah(line.purchasePrice * line.quantity) }}</p>
+          <p>Penjualan: {{ formatRupiah(line.subtotal) }}</p>
+          <p class="profit">Keuntungan: {{ formatRupiah(line.profit) }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-template #notFound>
+    <div class="empty-state">
+      <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+      <h2>Transaksi tidak ditemukan</h2>
+      <ion-button routerLink="/sales-report">Kembali ke Laporan</ion-button>
+    </div>
+  </ng-template>
+</ion-content>

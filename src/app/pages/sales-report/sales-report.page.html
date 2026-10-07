@@ -1,0 +1,94 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Laporan Penjualan</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid class="today-summary">
+    <ion-row>
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-subtitle>Omzet Hari Ini</ion-card-subtitle>
+            <ion-card-title>{{ formatRupiah(todaySales) }}</ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-subtitle>Keuntungan Hari Ini</ion-card-subtitle>
+            <ion-card-title class="profit">
+              {{ formatRupiah(todayProfit) }}
+            </ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ng-container *ngIf="dayGroups.length > 0; else emptyState">
+    <section
+      class="report-day"
+      *ngFor="let group of dayGroups; trackBy: trackByDate"
+    >
+      <ion-card class="day-total-card">
+        <ion-card-header>
+          <ion-card-subtitle>{{ formatDay(group.dateKey) }}</ion-card-subtitle>
+          <ion-card-title>{{ formatRupiah(group.totalSales) }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div>
+            <span>Total penjualan</span
+            ><strong>{{ formatRupiah(group.totalSales) }}</strong>
+          </div>
+          <div>
+            <span>Total keuntungan</span
+            ><strong class="profit"
+              >{{ formatRupiah(group.totalProfit) }}</strong
+            >
+          </div>
+          <div>
+            <span>Jumlah transaksi</span
+            ><strong>{{ group.transactions.length }}</strong>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-list inset="true">
+        <ion-list-header>
+          <ion-label>Rincian Transaksi</ion-label>
+        </ion-list-header>
+        <ion-item
+          *ngFor="let transaction of group.transactions; trackBy: trackById"
+          [routerLink]="['/sales-report/transaction', transaction.id]"
+          button="true"
+          detail="true"
+        >
+          <ion-label>
+            <h2>
+              {{ formatTime(transaction.createdAt) }} · {{
+              getItemCount(transaction) }} barang
+            </h2>
+            <p>Penjualan: {{ formatRupiah(transaction.total) }}</p>
+            <p class="profit">
+              Keuntungan: {{ formatRupiah(transaction.profit) }}
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </section>
+  </ng-container>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <ion-icon name="analytics-outline" aria-hidden="true"></ion-icon>
+      <h2>Belum ada laporan</h2>
+      <p>Laporan otomatis terbentuk setelah transaksi pertama.</p>
+    </div>
+  </ng-template>
+</ion-content>
