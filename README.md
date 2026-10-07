@@ -21,11 +21,12 @@ Semua halaman menggunakan pendekatan **NgModule** dan lazy loading. Proyek ini t
 
 ### Dashboard
 
-- Menampilkan jumlah produk yang tersimpan.
+- Menampilkan jumlah produk tersedia dibandingkan total produk.
 - Menampilkan jumlah transaksi hari ini.
-- Menampilkan total pendapatan hari ini.
-- Menampilkan produk terlaris hari ini.
-- Data dashboard diperbarui berdasarkan transaksi yang tersimpan.
+- Menampilkan omzet dan keuntungan hari ini.
+- Menampilkan tiga produk terlaris secara keseluruhan.
+- Membuka daftar produk, riwayat transaksi, laporan admin, dan peringkat produk langsung dari kartu dashboard.
+- Data dashboard diperbarui otomatis setelah produk atau transaksi berubah.
 
 ### Produk
 
@@ -36,8 +37,9 @@ Semua halaman menggunakan pendekatan **NgModule** dan lazy loading. Proyek ini t
 - Mengedit produk.
 - Validasi form produk.
 - Menampilkan harga, stok, dan jumlah terjual.
-- Menampilkan gambar placeholder ketika gambar produk tidak tersedia.
-- Menambahkan produk ke keranjang.
+- Menampilkan ilustrasi produk langsung pada setiap kartu.
+- Menambahkan produk ke keranjang dari kartu atau halaman detail.
+- Menampilkan label **Habis** ketika stok produk kosong.
 - Menonaktifkan pembelian ketika stok habis.
 - Menyimpan perubahan produk secara lokal.
 
@@ -51,16 +53,27 @@ Semua halaman menggunakan pendekatan **NgModule** dan lazy loading. Proyek ini t
 - Menghitung subtotal dan total belanja.
 - Menampilkan feedback berhasil atau gagal.
 - Mengonfirmasi keranjang menjadi transaksi.
+- Menampilkan badge jumlah barang pada tombol keranjang di halaman produk.
+- Menyimpan isi keranjang secara lokal agar tetap tersedia setelah reload.
 
 ### Transaksi
 
 - Menyimpan hasil konfirmasi transaksi.
 - Mengurangi stok produk setelah transaksi berhasil.
 - Menambah jumlah produk terjual.
-- Menampilkan riwayat transaksi.
+- Menampilkan riwayat transaksi yang dikelompokkan per hari.
 - Menampilkan detail transaksi.
 - Menampilkan waktu, daftar produk, quantity, subtotal, dan total transaksi.
 - Menyimpan transaksi secara lokal.
+- Memperbarui riwayat secara otomatis setelah checkout.
+
+### Laporan Admin
+
+- Menampilkan omzet dan keuntungan hari ini.
+- Menampilkan total penjualan dan keuntungan untuk setiap hari.
+- Menampilkan total penjualan dan keuntungan untuk setiap transaksi.
+- Menampilkan modal, penjualan, dan keuntungan setiap produk pada detail transaksi admin.
+- Menyimpan snapshot harga beli saat checkout agar keuntungan historis tetap akurat.
 
 ### Navigasi dan Tampilan
 
@@ -70,6 +83,7 @@ Semua halaman menggunakan pendekatan **NgModule** dan lazy loading. Proyek ini t
 - Halaman settings.
 - Halaman about.
 - Dark mode yang disimpan pada perangkat.
+- Tema hijau–kuning untuk light mode dan dark mode.
 - Animasi saat halaman ditampilkan.
 - Animasi feedback pada keranjang.
 - Dukungan pengaturan `prefers-reduced-motion`.
@@ -93,9 +107,12 @@ Semua halaman menggunakan pendekatan **NgModule** dan lazy loading. Proyek ini t
 | Detail produk    | `/product/:id`      |
 | Edit produk      | `/product/:id/edit` |
 | Keranjang        | `/cart`             |
-| Detail transaksi | `/transaction/:id`  |
-| Settings         | `/settings`         |
-| About            | `/about`            |
+| Detail transaksi | `/transaction/:id`                 |
+| Laporan admin    | `/sales-report`                    |
+| Detail laporan   | `/sales-report/transaction/:id`    |
+| Peringkat produk | `/top-products`                    |
+| Settings         | `/settings`                        |
+| About            | `/about`                           |
 
 Nilai `:id` diganti dengan ID produk atau transaksi yang dipilih.
 
@@ -202,14 +219,15 @@ Tekan `Ctrl + C` untuk menghentikan development server.
 
 1. Buka tab **Produk**.
 2. Gunakan kolom pencarian untuk mencari produk.
-3. Tekan salah satu produk untuk membuka detail.
-4. Tekan **Beli** untuk menambahkan produk ke keranjang.
-5. Buka halaman **Cart** melalui tombol keranjang pada detail produk.
+3. Tekan **Tambah ke Keranjang** pada kartu produk atau buka detail produk.
+4. Periksa badge jumlah barang pada tombol keranjang.
+5. Buka halaman **Keranjang** dari tombol pada halaman produk.
 6. Atur quantity sesuai kebutuhan.
 7. Tekan **Konfirmasi Transaksi**.
 8. Buka tab **Transaksi** untuk melihat transaksi yang dibuat.
 9. Tekan transaksi untuk membuka detailnya.
-10. Buka **Dashboard** untuk melihat ringkasan transaksi hari ini.
+10. Buka **Dashboard** untuk melihat ringkasan yang sudah diperbarui otomatis.
+11. Tekan kartu **Total Hari Ini** untuk membuka laporan admin.
 
 Untuk menambah produk:
 
@@ -256,10 +274,9 @@ SIMOBILE belum menggunakan API atau backend eksternal.
 Data berikut disimpan secara lokal pada browser atau perangkat:
 
 - Produk dan perubahan produk.
+- Isi dan quantity keranjang.
 - Riwayat transaksi.
 - Preferensi dark mode.
-
-Keranjang disimpan selama aplikasi masih berjalan. Ketika halaman dimuat ulang sepenuhnya, isi keranjang dapat kembali kosong.
 
 Data local storage dapat dihapus melalui developer tools browser jika aplikasi perlu dikembalikan ke kondisi awal.
 
