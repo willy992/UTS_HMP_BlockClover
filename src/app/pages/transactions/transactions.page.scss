@@ -23,3 +23,38 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
+.day-group {
+  display: block;
+  margin: 16px 0 24px;
+}
+
+.day-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 1rem;
+  }
+
+  p,
+  .transaction-id {
+    color: var(--ion-color-medium);
+    font-size: 0.8rem;
+  }
+
+  strong {
+    color: var(--ion-color-primary);
+  }
+}
+
+.transaction-id {
+  font-family: monospace;
+}

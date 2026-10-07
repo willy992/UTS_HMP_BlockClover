@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Transaction } from '../../models/transaction.model';
 import { TransactionService } from '../../services/transaction.service';
+import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-transaction-detail',
@@ -9,7 +10,7 @@ import { TransactionService } from '../../services/transaction.service';
   styleUrls: ['./transactiondetails.page.scss'],
   standalone: false,
 })
-export class TransactionDetailPage {
+export class TransactionDetailPage implements OnInit {
   transaction: Transaction | undefined;
 
   private readonly rupiahFormatter = new Intl.NumberFormat('id-ID', {
@@ -26,11 +27,20 @@ export class TransactionDetailPage {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly transactionService: TransactionService
+    private readonly transactionService: TransactionService,
+    private readonly productService: ProductService,
   ) {}
 
+  ngOnInit(): void {
+    this.loadTransaction();
+  }
+
   ionViewWillEnter(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+    this.loadTransaction();
+  }
+
+  private loadTransaction(): void {
+    const id = this.getRouteId();
 
     this.transaction = id
       ? this.transactionService.getById(id)
@@ -43,5 +53,27 @@ export class TransactionDetailPage {
 
   formatDate(dateValue: string): string {
     return this.dateFormatter.format(new Date(dateValue));
+  }
+
+  isOutOfStock(productId: number): boolean {
+    return this.productService.getById(productId)?.stock === 0;
+  }
+
+  private getRouteId(): string | null {
+    for (const snapshot of
+      this.route.snapshot.pathFromRoot ?? [this.route.snapshot]) {
+      const id = snapshot.paramMap.get('id');
+
+      if (id) {
+        return id;
+      }
+    }
+
+    const lastPathSegment = globalThis.location?.pathname
+      .split('/')
+      .filter(Boolean)
+      .at(-1);
+
+    return lastPathSegment ? decodeURIComponent(lastPathSegment) : null;
   }
 }

@@ -11,31 +11,45 @@
     </ion-toolbar>
   </ion-header>
 
-  <ng-container *ngIf="transactions.length > 0; else emptyState">
-    <ion-list inset="true">
-      <ion-item
-        *ngFor="let transaction of transactions; trackBy: trackById"
-        [routerLink]="['/transaction', transaction.id]"
-        detail="true"
-        button="true"
-      >
-        <ion-label>
-          <h2>{{ formatDate(transaction.createdAt) }}</h2>
-          <p>{{ getItemSummary(transaction) }}</p>
-        </ion-label>
+  <ng-container *ngIf="dayGroups.length > 0; else emptyState">
+    <section
+      class="day-group"
+      *ngFor="let group of dayGroups; trackBy: trackByDate"
+    >
+      <div class="day-heading">
+        <div>
+          <h2>{{ formatDay(group.dateKey) }}</h2>
+          <p>{{ group.transactions.length }} transaksi</p>
+        </div>
+        <strong>{{ formatRupiah(group.totalSales) }}</strong>
+      </div>
 
-        <ion-note slot="end" class="transaction-total">
-          {{ formatRupiah(transaction.total) }}
-        </ion-note>
-      </ion-item>
-    </ion-list>
+      <ion-list inset="true">
+        <ion-item
+          *ngFor="let transaction of group.transactions; trackBy: trackById"
+          [routerLink]="['/transaction', transaction.id]"
+          detail="true"
+          button="true"
+        >
+          <ion-label>
+            <h2>{{ formatDate(transaction.createdAt) }}</h2>
+            <p>{{ getItemSummary(transaction) }}</p>
+            <p class="transaction-id">{{ transaction.id }}</p>
+          </ion-label>
+
+          <ion-note slot="end" class="transaction-total">
+            {{ formatRupiah(transaction.total) }}
+          </ion-note>
+        </ion-item>
+      </ion-list>
+    </section>
   </ng-container>
 
   <ng-template #emptyState>
     <div class="empty-state">
       <ion-icon name="receipt-outline" aria-hidden="true"></ion-icon>
       <h2>Belum ada transaksi</h2>
-      <p>Transaksi yang berhasil dikonfirmasi akan muncul di sini.</p>
+      <p>Transaksi yang berhasil dikonfirmasi akan langsung muncul di sini.</p>
     </div>
   </ng-template>
 </ion-content>

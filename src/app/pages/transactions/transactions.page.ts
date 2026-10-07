@@ -1,5 +1,9 @@
-import { Component } from '@angular/core';
-import { Transaction } from '../../models/transaction.model';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import {
+  Transaction,
+  TransactionDayGroup,
+} from '../../models/transaction.model';
 import { TransactionService } from '../../services/transaction.service';
 
 @Component({
@@ -8,8 +12,10 @@ import { TransactionService } from '../../services/transaction.service';
   styleUrls: ['transactions.page.scss'],
   standalone: false,
 })
-export class TransactionsPage {
+export class TransactionsPage implements OnInit, OnDestroy {
   transactions: Transaction[] = [];
+  dayGroups: TransactionDayGroup[] = [];
+  private transactionSubscription?: Subscription;
 
   private readonly rupiahFormatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -25,8 +31,22 @@ export class TransactionsPage {
 
   constructor(private readonly transactionService: TransactionService) {}
 
+  ngOnInit(): void {
+    this.transactionSubscription = this.transactionService.transactions$.subscribe(
+      (transactions) => {
+        this.transactions = transactions;
+        this.dayGroups = this.transactionService.getDailyGroups();
+      },
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.transactionSubscription?.unsubscribe();
+  }
+
   ionViewWillEnter(): void {
     this.transactions = this.transactionService.getAll();
+    this.dayGroups = this.transactionService.getDailyGroups();
   }
 
   formatRupiah(amount: number): string {
@@ -35,6 +55,12 @@ export class TransactionsPage {
 
   formatDate(dateValue: string): string {
     return this.dateFormatter.format(new Date(dateValue));
+  }
+
+  formatDay(dateKey: string): string {
+    return new Intl.DateTimeFormat('id-ID', {
+      dateStyle: 'full',
+    }).format(new Date(`${dateKey}T12:00:00`));
   }
 
   getItemSummary(transaction: Transaction): string {
@@ -48,5 +74,9 @@ export class TransactionsPage {
 
   trackById(_: number, transaction: Transaction): string {
     return transaction.id;
+  }
+
+  trackByDate(_: number, group: TransactionDayGroup): string {
+    return group.dateKey;
   }
 }
