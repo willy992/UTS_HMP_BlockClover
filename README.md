@@ -1,6 +1,6 @@
 # SIMOBILE
 
-SIMOBILE adalah aplikasi Point of Sale sederhana berbasis Ionic Angular. Aplikasi ini digunakan untuk mengelola produk, keranjang belanja, dan transaksi secara lokal tanpa backend.
+SIMOBILE adalah aplikasi Point of Sale sederhana berbasis Ionic Angular. Aplikasi ini digunakan untuk mengelola produk, keranjang belanja, dan transaksi.
 
 Proyek ini dibuat untuk memenuhi tugas UTS mata kuliah Hybrid Mobile Programming.
 
@@ -9,13 +9,7 @@ Proyek ini dibuat untuk memenuhi tugas UTS mata kuliah Hybrid Mobile Programming
 - Ionic 9
 - Angular 22
 - TypeScript
-- SCSS
-- RxJS
-- Angular Reactive Forms
-- Local Storage
 - Angular NgModule
-
-Semua halaman menggunakan pendekatan **NgModule** dan lazy loading. Proyek ini tidak menggunakan standalone component.
 
 ## Fitur
 
@@ -101,18 +95,18 @@ Semua halaman menggunakan pendekatan **NgModule** dan lazy loading. Proyek ini t
 
 ### Route tambahan
 
-| Halaman          | Route               |
-| ---------------- | ------------------- |
-| Tambah produk    | `/product/new`      |
-| Detail produk    | `/product/:id`      |
-| Edit produk      | `/product/:id/edit` |
-| Keranjang        | `/cart`             |
-| Detail transaksi | `/transaction/:id`                 |
-| Laporan admin    | `/sales-report`                    |
-| Detail laporan   | `/sales-report/transaction/:id`    |
-| Peringkat produk | `/top-products`                    |
-| Settings         | `/settings`                        |
-| About            | `/about`                           |
+| Halaman          | Route                           |
+| ---------------- | ------------------------------- |
+| Tambah produk    | `/product/new`                  |
+| Detail produk    | `/product/:id`                  |
+| Edit produk      | `/product/:id/edit`             |
+| Keranjang        | `/cart`                         |
+| Detail transaksi | `/transaction/:id`              |
+| Laporan admin    | `/sales-report`                 |
+| Detail laporan   | `/sales-report/transaction/:id` |
+| Peringkat produk | `/top-products`                 |
+| Settings         | `/settings`                     |
+| About            | `/about`                        |
 
 Nilai `:id` diganti dengan ID produk atau transaksi yang dipilih.
 
@@ -177,20 +171,24 @@ node --version
 npm --version
 ```
 
-Ionic CLI global bersifat opsional karena proyek dapat dijalankan melalui npm script.
-
 ## Instalasi
+
+Install Ionic CLI Global:
+
+```bash
+npm install -g @ionic/cli
+```
 
 Clone repository:
 
 ```bash
-git clone https://github.com/willy992/UTS-HMP-IONIC.git
+git clone https://github.com/willy992/UTS_HMP_BlockClover.git
 ```
 
 Masuk ke folder proyek:
 
 ```bash
-cd UTS-HMP-IONIC
+cd UTS_HMP_BlockClover
 ```
 
 Install dependency:
@@ -204,13 +202,8 @@ npm install
 Jalankan development server:
 
 ```bash
-npm start
-```
-
-Buka alamat berikut melalui browser:
-
-```text
-http://localhost:4200
+npm run build
+ionic serve
 ```
 
 Tekan `Ctrl + C` untuk menghentikan development server.
@@ -279,49 +272,3 @@ Data berikut disimpan secara lokal pada browser atau perangkat:
 - Preferensi dark mode.
 
 Data local storage dapat dihapus melalui developer tools browser jika aplikasi perlu dikembalikan ke kondisi awal.
-
-## Alur Kerja Git
-
-Sebelum mulai bekerja:
-
-```bash
-git checkout main
-git pull origin main
-```
-
-Pindah ke branch masing-masing:
-
-```bash
-git checkout nama-branch
-```
-
-Gabungkan pembaruan dari `main` jika diperlukan:
-
-```bash
-git merge main
-```
-
-Sebelum commit:
-
-```bash
-git status
-git diff
-```
-
-Stage hanya file yang berhubungan dengan langkah tersebut:
-
-```bash
-git add path/file-yang-diubah
-```
-
-Buat commit yang menjelaskan satu perubahan:
-
-```bash
-git commit -m "feat: describe the completed feature"
-```
-
-Push branch:
-
-```bash
-git push origin nama-branch
-```
