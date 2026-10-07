@@ -1,6 +1,11 @@
 import { inject, Service } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { CartItem } from '../models/cart-item.model';
-import { Transaction, TransactionLine } from '../models/transaction.model';
+import {
+  Transaction,
+  TransactionDayGroup,
+  TransactionLine,
+} from '../models/transaction.model';
 import { ProductService } from './product.service';
 
 @Service()
@@ -8,6 +13,10 @@ export class TransactionService {
   private readonly storageKey = 'simobile-transactions';
   private readonly productService = inject(ProductService);
   private transactions: Transaction[] = this.loadTransactions();
+  private readonly transactionsSubject = new BehaviorSubject<Transaction[]>(
+    this.getAll(),
+  );
+  readonly transactions$ = this.transactionsSubject.asObservable();
 
   checkout(items: CartItem[]): Transaction | undefined {
     const groupedQuantities = new Map<number, number>();
@@ -48,13 +57,16 @@ export class TransactionService {
       ([productId, quantity]) => {
         const product = this.productService.getById(productId)!;
         const price = product.sellingPrice;
+        const purchasePrice = product.purchasePrice;
 
         return {
           productId,
           productName: product.name,
+          purchasePrice,
           price,
           quantity,
           subtotal: price * quantity,
+          profit: (price - purchasePrice) * quantity,
         };
       }
     );
@@ -64,6 +76,7 @@ export class TransactionService {
       createdAt: new Date().toISOString(),
       lines,
       total: lines.reduce((total, line) => total + line.subtotal, 0),
+      profit: lines.reduce((total, line) => total + line.profit, 0),
     };
 
     const nextTransactions = [transaction, ...this.transactions];
@@ -77,6 +90,7 @@ export class TransactionService {
     }
 
     this.transactions = nextTransactions;
+    this.publishTransactions();
 
     return this.cloneTransaction(transaction);
   }
@@ -107,6 +121,38 @@ export class TransactionService {
       .reduce((total, transaction) => total + transaction.total, 0);
   }
 
+  getTodayProfit(): number {
+    return this.transactions
+      .filter((transaction) => this.isToday(transaction.createdAt))
+      .reduce((total, transaction) => total + transaction.profit, 0);
+  }
+
+  getDailyGroups(): TransactionDayGroup[] {
+    const groups = new Map<string, Transaction[]>();
+
+    for (const transaction of this.getAll()) {
+      const dateKey = this.toLocalDateKey(transaction.createdAt);
+      const transactions = groups.get(dateKey) ?? [];
+      transactions.push(transaction);
+      groups.set(dateKey, transactions);
+    }
+
+    return [...groups.entries()]
+      .sort(([first], [second]) => second.localeCompare(first))
+      .map(([dateKey, transactions]) => ({
+        dateKey,
+        transactions,
+        totalSales: transactions.reduce(
+          (total, transaction) => total + transaction.total,
+          0,
+        ),
+        totalProfit: transactions.reduce(
+          (total, transaction) => total + transaction.profit,
+          0,
+        ),
+      }));
+  }
+
   getTodayBestSeller(): TransactionLine | undefined {
     const soldToday = new Map<number, TransactionLine>();
 
@@ -122,6 +168,7 @@ export class TransactionService {
           ...line,
           quantity: (existing?.quantity ?? 0) + line.quantity,
           subtotal: (existing?.subtotal ?? 0) + line.subtotal,
+          profit: (existing?.profit ?? 0) + line.profit,
         });
       }
     }
@@ -141,12 +188,18 @@ export class TransactionService {
     try {
       const parsedTransactions: unknown = JSON.parse(savedTransactions);
 
-      return Array.isArray(parsedTransactions) &&
-        parsedTransactions.every((transaction) =>
-          this.isTransaction(transaction)
+      if (
+        !Array.isArray(parsedTransactions) ||
+        !parsedTransactions.every((transaction) =>
+          this.isStoredTransaction(transaction),
         )
-        ? parsedTransactions
-        : [];
+      ) {
+        return [];
+      }
+
+      return parsedTransactions.map((transaction) =>
+        this.normalizeTransaction(transaction),
+      );
     } catch {
       return [];
     }
@@ -179,7 +232,16 @@ export class TransactionService {
     return new Date(dateValue).toDateString() === new Date().toDateString();
   }
 
-  private isTransaction(value: unknown): value is Transaction {
+  private toLocalDateKey(dateValue: string): string {
+    const date = new Date(dateValue);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private isStoredTransaction(value: unknown): boolean {
     if (typeof value !== 'object' || value === null) {
       return false;
     }
@@ -193,14 +255,16 @@ export class TransactionService {
       Number.isFinite(Date.parse(transaction['createdAt'])) &&
       Array.isArray(transaction['lines']) &&
       transaction['lines'].length > 0 &&
-      transaction['lines'].every((line) => this.isTransactionLine(line)) &&
+      transaction['lines'].every((line) =>
+        this.isStoredTransactionLine(line),
+      ) &&
       typeof transaction['total'] === 'number' &&
       Number.isFinite(transaction['total']) &&
       transaction['total'] >= 0
     );
   }
 
-  private isTransactionLine(value: unknown): value is TransactionLine {
+  private isStoredTransactionLine(value: unknown): boolean {
     if (typeof value !== 'object' || value === null) {
       return false;
     }
@@ -218,8 +282,50 @@ export class TransactionService {
       (line['quantity'] as number) > 0 &&
       typeof line['subtotal'] === 'number' &&
       Number.isFinite(line['subtotal']) &&
-      line['subtotal'] > 0
+      line['subtotal'] > 0 &&
+      (line['purchasePrice'] === undefined ||
+        (typeof line['purchasePrice'] === 'number' &&
+          Number.isFinite(line['purchasePrice']) &&
+          line['purchasePrice'] >= 0)) &&
+      (line['profit'] === undefined ||
+        (typeof line['profit'] === 'number' &&
+          Number.isFinite(line['profit'])))
     );
+  }
+
+  private normalizeTransaction(value: unknown): Transaction {
+    const storedTransaction = value as Record<string, unknown>;
+    const storedLines = storedTransaction['lines'] as Array<
+      Record<string, unknown>
+    >;
+    const lines = storedLines.map((storedLine): TransactionLine => {
+      const productId = storedLine['productId'] as number;
+      const price = storedLine['price'] as number;
+      const quantity = storedLine['quantity'] as number;
+      const currentProduct = this.productService.getById(productId);
+      const purchasePrice =
+        typeof storedLine['purchasePrice'] === 'number'
+          ? storedLine['purchasePrice']
+          : currentProduct?.purchasePrice ?? price;
+
+      return {
+        productId,
+        productName: storedLine['productName'] as string,
+        purchasePrice,
+        price,
+        quantity,
+        subtotal: price * quantity,
+        profit: (price - purchasePrice) * quantity,
+      };
+    });
+
+    return {
+      id: storedTransaction['id'] as string,
+      createdAt: storedTransaction['createdAt'] as string,
+      lines,
+      total: lines.reduce((total, line) => total + line.subtotal, 0),
+      profit: lines.reduce((total, line) => total + line.profit, 0),
+    };
   }
 
   private cloneTransaction(transaction: Transaction): Transaction {
@@ -227,5 +333,9 @@ export class TransactionService {
       ...transaction,
       lines: transaction.lines.map((line) => ({ ...line })),
     };
+  }
+
+  private publishTransactions(): void {
+    this.transactionsSubject.next(this.getAll());
   }
 }

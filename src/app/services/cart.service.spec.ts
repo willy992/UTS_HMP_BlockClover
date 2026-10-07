@@ -54,4 +54,18 @@
       expect(service.getItems()[0].quantity).toBe(1);
       expect(service.getItems()[0].product.name).toBe('Beras Ramos 5 kg');
     });
+
+    it('publishes the current cart item count', () => {
+      const counts: number[] = [];
+      const subscription = service.itemCount$.subscribe((count) =>
+        counts.push(count)
+      );
+
+      service.add(1);
+      service.add(1);
+      service.clear();
+
+      expect(counts).toEqual([0, 1, 2, 0]);
+      subscription.unsubscribe();
+    });
   });

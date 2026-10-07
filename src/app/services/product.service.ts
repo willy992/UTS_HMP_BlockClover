@@ -1,4 +1,5 @@
 import { Service } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Product, ProductPayload } from '../models/product.model';
 
 @Service()
@@ -119,19 +120,24 @@ export class ProductService {
             sold: 16
         }
     ];
+    private readonly productsSubject = new BehaviorSubject<Product[]>([]);
+    readonly products$ = this.productsSubject.asObservable();
     
     constructor() {
-    this.loadSavedProducts();
-}
+        this.loadSavedProducts();
+        this.publishProducts();
+    }
 
     //get all produk
     getAll(): Product[] {
-        return this.products;
+        return this.products.map(product => ({ ...product }));
     }
 
     //search produk by id
     getById(id: number): Product | undefined {
-        return this.products.find(product => product.id === id);
+        const product = this.products.find(item => item.id === id);
+
+        return product ? { ...product } : undefined;
     }
 
     //get total produk yg avail
@@ -139,11 +145,20 @@ export class ProductService {
         return this.products.length;
     }
 
+    getAvailableProductsCount(): number {
+        return this.products.filter(product => product.stock > 0).length;
+    }
+
     //get bestseller produk
     getBestSeller(): Product | undefined {
-        return [...this.products].sort(
-            (a, b) => b.sold - a.sold
-        )[0];
+        return this.getTopSelling(1)[0];
+    }
+
+    getTopSelling(limit = 3): Product[] {
+        return [...this.products]
+            .sort((first, second) => second.sold - first.sold)
+            .slice(0, Math.max(0, limit))
+            .map(product => ({ ...product }));
     }
 
     //tambah produk
@@ -158,8 +173,9 @@ export class ProductService {
 
         this.products.push(product);
         this.saveProducts();
+        this.publishProducts();
 
-        return product;
+        return { ...product };
     }
 
     //update or edit produk
@@ -177,13 +193,14 @@ export class ProductService {
             ...payload
         };
         this.saveProducts();
+        this.publishProducts();
 
-        return this.products[index];
+        return { ...this.products[index] };
     }
 
     //kurangi qty stok produk
     reduceStock(id: number, quantity: number): boolean {
-        const product = this.getById(id);
+        const product = this.products.find(item => item.id === id);
 
         if (!product || product.stock < quantity) {
             return false;
@@ -192,6 +209,7 @@ export class ProductService {
         product.stock -= quantity;
         product.sold += quantity;
         this.saveProducts();
+        this.publishProducts();
 
         return true;
     }
@@ -295,6 +313,10 @@ private saveProducts(): void {
     } catch {
         // Keep the in-memory changes without crashing the app.
     }
+}
+
+private publishProducts(): void {
+    this.productsSubject.next(this.getAll());
 }
 }
 
